@@ -1,0 +1,17 @@
+# Documents locaux hors du rendu
+/chris/
+/brief/
+
+# Fichiers RH : conserver uniquement sur le poste et dans Snowflake
+drivers.csv
+driver_shifts.csv
+
+# Secrets et fichiers de connexion locaux
+.env
+.env.*
+*.p8
+*.pem
+connections.toml
+
+# Système
+.DS_Store
