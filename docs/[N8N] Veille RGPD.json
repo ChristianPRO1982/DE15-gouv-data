@@ -23,7 +23,7 @@
         "responses": {
           "values": [
             {
-              "content": "=Tu réalises une veille réglementaire et technique pour le projet\nHudson Cab. Produis une synthèse en français, au format Markdown.\n\nPÉRIODE FOURNIE PAR N8N\n- Début inclus : {{ $json.date_debut }}\n- Fin exclue : {{ $json.date_fin }}\n\nUtilise exactement ces dates : ne recalcule pas le mois.\nRespecte les restrictions de domaines configurées dans le node.\n\nCONTEXTE\nHudson Cab Europe, établie à Paris, décide de la gestion des données\nRH de chauffeurs employés à New York. L’entrepôt utilise Snowflake\nEnterprise, hébergé dans la région AWS Paris.\n\nLes données comprennent identité, coordonnées, licence professionnelle,\ndates d’emploi, dépôt de rattachement et activité des chauffeurs :\nservices, horaires, heures travaillées, courses et recettes.\n\nLa gouvernance prévoit :\n- des accès par rôle et par dépôt ;\n- le masquage des données personnelles ;\n- une suppression cinq ans après la fin du contrat ;\n- une rétention Time Travel limitée à un jour ;\n- le retrait des fichiers du stage après chargement ;\n- des contrôles de qualité, des tâches planifiées et un audit des accès.\n\nSUJETS À SURVEILLER\n- RGPD : champ territorial, responsabilités, bases légales et transferts.\n- Gestion RH : conservation, archivage, minimisation et droits des personnes.\n- Obligations new-yorkaises pertinentes pour les données des chauffeurs.\n- Snowflake : accès, masquage, tags, catalogue, rétention, Fail-safe,\n  qualité, tâches planifiées et historique des accès.\n- Évolutions des conditions de sous-traitance et de sécurité pertinentes.\n\nRECHERCHE ET VÉRIFICATION\n1. Effectue une recherche web réelle dans le périmètre configuré.\n2. Ouvre les pages pertinentes : un extrait de moteur de recherche\n   ne suffit pas pour présenter une information comme vérifiée.\n3. Retient les publications ou mises à jour substantielles datées dans\n   la période fournie. Une date de consultation ou d’indexation ne\n   constitue pas une date de publication.\n4. Pour une page mise à jour, identifie le changement effectivement\n   documenté. Si tu ne peux pas déterminer ce qui a changé, indique-le\n   et ne présente pas la page comme une nouveauté confirmée.\n5. Distingue publication, adoption, entrée en vigueur et échéance.\n   Une publication du mois peut annoncer une application ultérieure.\n6. Recherche aussi les entrées en vigueur et échéances survenues\n   pendant la période, même si leur texte a été publié auparavant.\n   Présente-les dans une section distincte.\n7. Distingue obligation légale, recommandation, consultation publique,\n   annonce et évolution technique.\n8. Regroupe les publications traitant d’une même évolution pour éviter\n   les doublons. Écarte les contenus sans conséquence pour ce projet.\n9. Ne déduis pas automatiquement qu’une règle française s’applique aux\n   salariés new-yorkais. Compare les périmètres et points de départ\n   des durées de conservation.\n10. N’invente aucun texte, changement, article, date ou lien.\n    Signale les sources inaccessibles et les informations incertaines.\n11. Si la recherche web n’est pas disponible, indique clairement :\n    « Veille non exécutée : recherche web indisponible ».\n    Ne produis alors aucune nouveauté supposée.\n\nSORTIE ATTENDUE — MARKDOWN UNIQUEMENT\nN’utilise pas de bloc de code autour de la réponse.\n\n# Veille Hudson Cab — [période fournie]\n\n- **Période :** [début inclus ; fin exclue]\n- **Couverture :** [sources effectivement consultées]\n- **Statut :** recherche réalisée / partielle / non exécutée\n\n## Points à retenir\n\nAu maximum cinq points, classés par importance.\nPour chaque point : nouveauté concrète, conséquence pour Hudson Cab\net lien direct vers la source officielle.\nN’ajoute aucun point uniquement pour atteindre cinq éléments.\n\n## Publications et mises à jour du mois\n\nPour chaque évolution pertinente :\n\n### [Titre] — [priorité haute, moyenne ou faible]\n\n- **Organisme :**\n- **Nature :** obligation / recommandation / consultation / évolution technique\n- **Publication ou mise à jour :**\n- **Entrée en vigueur ou échéance :** [date ou « non précisée »]\n- **Nouveauté vérifiée :** [synthèse courte et factuelle]\n- **Conséquence pour Hudson Cab :** [donnée, table, rôle ou règle concerné]\n- **Action proposée :**\n- **Responsable proposé :** data / RH / sécurité / DPO / juriste\n- **Source :** [titre explicite](URL directe)\n- **Article ou section :** [si applicable]\n\n## Entrées en vigueur et échéances du mois\n\nPrésente uniquement les événements vérifiés survenus dans la période,\navec leur source et leur conséquence. Évite de répéter les fiches :\nrenvoie à la fiche correspondante si nécessaire.\n\n## Actions prioritaires\n\n| Priorité | Action | Responsable proposé | Échéance documentée |\n|---|---|---|---|\n\nN’invente pas de délai obligatoire. Une date suggérée doit être\nexplicitement présentée comme une proposition.\n\n## Couverture et limites\n\n| Source | Pages ou rubriques consultées | Résultat ou limite |\n|---|---|---|\n\nSignale les recherches infructueuses, pages inaccessibles et dates\nimpossibles à confirmer. Ne prétends pas que la recherche est exhaustive.\n\nSi aucune nouveauté pertinente n’est trouvée, écris :\n« Aucune nouveauté pertinente trouvée pour cette période dans les\nsources consultées. »\nDistingue ce résultat d’une recherche impossible ou partielle.\n\n## Questions à soumettre au DPO ou au juriste\n\nUniquement les questions soulevées par les résultats de cette période.\nS’il n’y en a pas, indique « Aucune nouvelle question identifiée »."
+              "content": "=Tu réalises une veille réglementaire et technique pour le projet\nHudson Cab. Produis une synthèse en français, au format Markdown.\n\nPÉRIODE FOURNIE PAR N8N\n- Début inclus : {{ $json.date_debut }}\n- Fin exclue : {{ $json.date_fin }}\n\nLes dates sont au format ISO YYYY-MM-DD (année-mois-jour), sans ambiguïté.\nLa période est le mois civil précédent, calculé par n8n dans Europe/Paris.\nLa borne de début est incluse à 00:00 ; la borne de fin est exclue à 00:00.\nUtilise exactement ces dates : ne recalcule ni ne décale le mois.\nReproduis les deux bornes en ISO dans le titre et dans la ligne Période.\nNe convertis jamais ces valeurs en MM/DD/YYYY ou DD/MM/YYYY.\nSi une borne est absente, invalide, non ISO ou si début >= fin, réponds\nuniquement « Veille non exécutée : période invalide » ; n'effectue pas de recherche.\nVérifie que chaque publication retenue appartient à cet intervalle. Une\nentrée en vigueur d'un texte plus ancien doit appartenir à cet intervalle\net figurer dans la section dédiée.\nRespecte les restrictions de domaines configurées dans le node.\n\nCONTEXTE\nHudson Cab Europe, établie à Paris, décide de la gestion des données\nRH de chauffeurs employés à New York. L’entrepôt utilise Snowflake\nEnterprise, hébergé dans la région AWS Paris.\n\nLes données comprennent identité, coordonnées, licence professionnelle,\ndates d’emploi, dépôt de rattachement et activité des chauffeurs :\nservices, horaires, heures travaillées, courses et recettes.\n\nLa gouvernance prévoit :\n- des accès par rôle et par dépôt ;\n- le masquage des données personnelles ;\n- une suppression cinq ans après la fin du contrat ;\n- une rétention Time Travel limitée à un jour ;\n- le retrait des fichiers du stage après chargement ;\n- des contrôles de qualité, des tâches planifiées et un audit des accès.\n\nSUJETS À SURVEILLER\n- RGPD : champ territorial, responsabilités, bases légales et transferts.\n- Gestion RH : conservation, archivage, minimisation et droits des personnes.\n- Obligations new-yorkaises pertinentes pour les données des chauffeurs.\n- Snowflake : accès, masquage, tags, catalogue, rétention, Fail-safe,\n  qualité, tâches planifiées et historique des accès.\n- Évolutions des conditions de sous-traitance et de sécurité pertinentes.\n\nRECHERCHE ET VÉRIFICATION\n1. Effectue une recherche web réelle dans le périmètre configuré.\n2. Ouvre les pages pertinentes : un extrait de moteur de recherche\n   ne suffit pas pour présenter une information comme vérifiée.\n3. Retient les publications ou mises à jour substantielles datées dans\n   la période fournie. Une date de consultation ou d’indexation ne\n   constitue pas une date de publication.\n4. Pour une page mise à jour, identifie le changement effectivement\n   documenté. Si tu ne peux pas déterminer ce qui a changé, indique-le\n   et ne présente pas la page comme une nouveauté confirmée.\n5. Distingue publication, adoption, entrée en vigueur et échéance.\n   Une publication du mois peut annoncer une application ultérieure.\n6. Recherche aussi les entrées en vigueur et échéances survenues\n   pendant la période, même si leur texte a été publié auparavant.\n   Présente-les dans une section distincte.\n7. Distingue obligation légale, recommandation, consultation publique,\n   annonce et évolution technique.\n8. Regroupe les publications traitant d’une même évolution pour éviter\n   les doublons. Écarte les contenus sans conséquence pour ce projet.\n9. Ne déduis pas automatiquement qu’une règle française s’applique aux\n   salariés new-yorkais. Compare les périmètres et points de départ\n   des durées de conservation.\n10. N’invente aucun texte, changement, article, date ou lien.\n    Signale les sources inaccessibles et les informations incertaines.\n11. Si la recherche web n’est pas disponible, indique clairement :\n    « Veille non exécutée : recherche web indisponible ».\n    Ne produis alors aucune nouveauté supposée.\n\nSORTIE ATTENDUE — MARKDOWN UNIQUEMENT\nN’utilise pas de bloc de code autour de la réponse.\n\n# Veille Hudson Cab — {{ $json.date_debut }} → {{ $json.date_fin }} (fin exclue)\n\n- **Période :** [{{ $json.date_debut }} inclus ; {{ $json.date_fin }} exclu]\n- **Couverture :** [sources effectivement consultées]\n- **Statut :** recherche réalisée / partielle / non exécutée\n\n## Points à retenir\n\nAu maximum cinq points, classés par importance.\nPour chaque point : nouveauté concrète, conséquence pour Hudson Cab\net lien direct vers la source officielle.\nN’ajoute aucun point uniquement pour atteindre cinq éléments.\n\n## Publications et mises à jour du mois\n\nPour chaque évolution pertinente :\n\n### [Titre] — [priorité haute, moyenne ou faible]\n\n- **Organisme :**\n- **Nature :** obligation / recommandation / consultation / évolution technique\n- **Publication ou mise à jour :**\n- **Entrée en vigueur ou échéance :** [date ou « non précisée »]\n- **Nouveauté vérifiée :** [synthèse courte et factuelle]\n- **Conséquence pour Hudson Cab :** [donnée, table, rôle ou règle concerné]\n- **Action proposée :**\n- **Responsable proposé :** data / RH / sécurité / DPO / juriste\n- **Source :** [titre explicite](URL directe)\n- **Article ou section :** [si applicable]\n\n## Entrées en vigueur et échéances du mois\n\nPrésente uniquement les événements vérifiés survenus dans la période,\navec leur source et leur conséquence. Évite de répéter les fiches :\nrenvoie à la fiche correspondante si nécessaire.\n\n## Actions prioritaires\n\n| Priorité | Action | Responsable proposé | Échéance documentée |\n|---|---|---|---|\n\nN’invente pas de délai obligatoire. Une date suggérée doit être\nexplicitement présentée comme une proposition.\n\n## Couverture et limites\n\n| Source | Pages ou rubriques consultées | Résultat ou limite |\n|---|---|---|\n\nSignale les recherches infructueuses, pages inaccessibles et dates\nimpossibles à confirmer. Ne prétends pas que la recherche est exhaustive.\n\nSi aucune nouveauté pertinente n’est trouvée, écris :\n« Aucune nouveauté pertinente trouvée pour cette période dans les\nsources consultées. »\nDistingue ce résultat d’une recherche impossible ou partielle.\n\n## Questions à soumettre au DPO ou au juriste\n\nUniquement les questions soulevées par les résultats de cette période.\nS’il n’y en a pas, indique « Aucune nouvelle question identifiée »."
             }
           ]
         },
@@ -52,7 +52,12 @@
     },
     {
       "parameters": {
-        "options": {}
+        "operation": "getCurrentDate",
+        "includeTime": true,
+        "outputFieldName": "currentDate",
+        "options": {
+          "timezone": "Europe/Paris"
+        }
       },
       "type": "n8n-nodes-base.dateTime",
       "typeVersion": 2,
@@ -65,54 +70,8 @@
     },
     {
       "parameters": {
-        "operation": "formatDate",
-        "date": "={{ $json.currentDate }}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.dateTime",
-      "typeVersion": 2,
-      "position": [
-        448,
-        -672
-      ],
-      "id": "962c4362-e770-43e4-a063-7a5818b45b7a",
-      "name": "formatCurrentDate"
-    },
-    {
-      "parameters": {
-        "operation": "addToDate",
-        "magnitude": "={{ $json.currentDate }}",
-        "duration": -32,
-        "options": {}
-      },
-      "type": "n8n-nodes-base.dateTime",
-      "typeVersion": 2,
-      "position": [
-        672,
-        -672
-      ],
-      "id": "35bfe736-93c4-45e5-a2a1-7a2f12b9e33d",
-      "name": "dateBefore"
-    },
-    {
-      "parameters": {
-        "operation": "formatDate",
-        "date": "={{ $json.newDate }}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.dateTime",
-      "typeVersion": 2,
-      "position": [
-        896,
-        -672
-      ],
-      "id": "00ff3692-11bd-4ccc-9738-0c4001eb8dd0",
-      "name": "formatDateBefore"
-    },
-    {
-      "parameters": {
         "toRecipients": "christian.martiny@outlook.com",
-        "subject": "Veille RGPD",
+        "subject": "=Veille RGPD — {{ $('dates').item.json.date_debut }} → {{ $('dates').item.json.date_fin }} (fin exclue)",
         "bodyContent": "={{ $json.data }}",
         "additionalFields": {
           "bodyContentType": "html"
@@ -141,13 +100,13 @@
             {
               "id": "d1540955-08a5-444f-aedf-93c06629a307",
               "name": "date_debut",
-              "value": "={{ $json.formattedDate }}",
+              "value": "={{ DateTime.fromISO($json.currentDate).setZone('Europe/Paris').startOf('month').minus({ months: 1 }).toISODate() }}",
               "type": "string"
             },
             {
               "id": "351939f3-c6b2-45a9-bfaf-ab277353b526",
               "name": "date_fin",
-              "value": "={{ $('formatCurrentDate').item.json.formattedDate }}",
+              "value": "={{ DateTime.fromISO($json.currentDate).setZone('Europe/Paris').startOf('month').toISODate() }}",
               "type": "string"
             }
           ]
@@ -161,7 +120,9 @@
         -672
       ],
       "id": "9f5569e1-97a8-44ce-957b-aab71aea458c",
-      "name": "dates"
+      "name": "dates",
+      "notes": "Mois civil précédent, début inclus et fin exclue à minuit Europe/Paris. Dates ISO YYYY-MM-DD, calculées depuis le même instant currentDate. Exécution le 2026-11-03 : [2026-10-01 ; 2026-11-01[.",
+      "notesInFlow": true
     },
     {
       "parameters": {
@@ -169,7 +130,10 @@
           "interval": [
             {
               "field": "months",
-              "triggerAtHour": 7
+              "monthsInterval": 1,
+              "triggerAtDayOfMonth": 1,
+              "triggerAtHour": 7,
+              "triggerAtMinute": 0
             }
           ]
         }
@@ -239,39 +203,6 @@
       "main": [
         [
           {
-            "node": "formatCurrentDate",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "formatCurrentDate": {
-      "main": [
-        [
-          {
-            "node": "dateBefore",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "dateBefore": {
-      "main": [
-        [
-          {
-            "node": "formatDateBefore",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "formatDateBefore": {
-      "main": [
-        [
-          {
             "node": "dates",
             "type": "main",
             "index": 0
@@ -338,7 +269,8 @@
   "active": false,
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "timezone": "Europe/Paris"
   },
   "versionId": "c8a16459-aa95-4fa6-85af-716ade01a5ea",
   "meta": {

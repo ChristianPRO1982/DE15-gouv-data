@@ -73,6 +73,12 @@ Ne modifie pas le contrat et ne produis pas de code ni de résultat de test
 Snowflake. Ne confonds pas proposition technique et mesure déjà appliquée.
 ```
 
+## Automatisation mensuelle avec n8n
+
+Pour le workflow automatisé, utiliser [PROMPT_VEILLE_N8N.md](PROMPT_VEILLE_N8N.md), synchronisé avec le node du workflow. La période est le mois civil précédent, calculé par n8n en `Europe/Paris` : bornes ISO `YYYY-MM-DD`, début inclus et fin exclue. Ne pas utiliser les dates ambiguës avec `/`. Voir [N8N_VEILLE.md](N8N_VEILLE.md) pour la correction du premier essai et la validation après import.
+
+Le prompt hebdomadaire suivant reste une option de revue manuelle complémentaire ; il ne décrit pas la fréquence du workflow mensuel.
+
 ## Prompt pour la revue hebdomadaire
 
 ```text

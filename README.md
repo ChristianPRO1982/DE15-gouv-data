@@ -84,6 +84,8 @@ Les références précises, l’examen des huit règles de qualité et les quest
 
 Outil choisi par le titulaire : **ChatGPT web avec recherche web**, avec revue manuelle hebdomadaire proposée le lundi à 9 h Paris et quotidienne pendant le brief. Les [prompts initial et hebdomadaire](docs/PROMPT_VEILLE.md) précisent les sources officielles, les documents à joindre et les preuves à conserver. Responsable proposé : porteur du travail local, avec relecture du binôme et arbitrage juridique par le DPO/juriste.
 
+**Automatisation mensuelle n8n :** l’[export du workflow](docs/%5BN8N%5D%20Veille%20RGPD.json) est corrigé pour le mois civil précédent, bornes ISO inclus/exclu et fuseau `Europe/Paris`. Planification : le 1er à 07:00 Paris. Les [instructions](docs/N8N_VEILLE.md) précisent la réimportation et les vérifications ; l’export reste désactivé. Le premier e-mail reçu a interprété les dates en février–mars et ne prouve pas la couverture d’octobre. Une nouvelle exécution avec les bornes corrigées est nécessaire.
+
 **Première recherche réalisée :** le titulaire a fourni le [compte rendu ChatGPT](docs/resultat_chatgpt.md) et la note correspondante le 3 novembre 2026.
 
 **À terminer :** capture réelle dans `docs/`, confirmation de la répartition et mécanisme d’alerte. Une revue manuelle n’est pas un abonnement : l’exigence du brief de recevoir les nouveautés reste à satisfaire par un abonnement complémentaire ou une adaptation validée par le formateur. Aucun abonnement, rappel ni capture n’a été créé ici ; la validation complète du jour 1 matin reste ouverte sur ces points.

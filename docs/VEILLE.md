@@ -208,6 +208,16 @@ Les finalités « administration RH », « paie », « planification des service
 
 `2026-11-03 | Première analyse | RGPD art. 3 §1 confirmé ; R1 (5 ans) et R2 (Fail-safe) à arbitrer ; NY Labor Law §195(4) et DPA Snowflake 2026 ajoutés au périmètre ; aucun abonnement activé | Équipe data : documenter ; DPO/juristes : arbitrer | Prochaine revue proposée : lundi 2026-11-09 à 09:00 Europe/Paris (à confirmer dans le binôme).`
 
+### Correction de la période du workflow n8n — 2026-11-03
+
+La note initiale ci-dessus est un état des connaissances au **2026-11-03**, et non un relevé des nouveautés d’un seul mois. Sa date de recherche reste valable.
+
+Pour les revues automatisées, le workflow `[N8N] Veille RGPD.json` couvre désormais le **mois civil précédent** dans le fuseau **Europe/Paris**, avec deux bornes ISO `YYYY-MM-DD` : début inclus, fin exclue. Les deux dates sont calculées dans n8n depuis un même instant ; le LLM doit les reproduire sans les réinterpréter. Le déclenchement est configuré le **1er de chaque mois à 07:00 Paris**. Exemple pour une exécution le 2026-11-03 : **[2026-10-01 ; 2026-11-01[**, soit octobre 2026. La prochaine occurrence configurée après cette correction est le **2026-12-01 à 07:00 Paris**, pour novembre, sous réserve de publication/activation dans n8n.
+
+Le message local `Veille RGPD.msg` conserve les résultats du premier essai sur février–mars 2026. Ses dates ont été normalisées en ISO dans le corps et l’aperçu : **2026-02-10 inclus à 2026-03-11 exclu**. Les anciennes valeurs étaient `10/02/2026` et `11/03/2026`. Le format américain par défaut de l’ancien workflow explique une inversion possible : ces valeurs auraient désigné le 2 octobre et le 3 novembre. Cet e-mail **ne valide pas la couverture d’octobre 2026**. Changer seulement son titre rendrait ses résultats trompeurs ; il faut relancer la recherche avec les bornes corrigées.
+
+Le [prompt mensuel](PROMPT_VEILLE_N8N.md) et les [instructions de vérification](N8N_VEILLE.md) décrivent la nouvelle convention. La correction de l’export local ne modifie pas le workflow déjà importé dans n8n : réimporter ou reporter ces changements. Aucune nouvelle recherche ni aucun envoi d’e-mail n’a été exécuté depuis cette session ; le rapport mensuel corrigé reste à produire et à vérifier. L’export reste désactivé (`active: false`).
+
 ### Pièces de preuve à créer hors de cette note
 
 - Capture réelle de la recherche web avec la date et les sources/citations (ex. `docs/veille_chatgpt_2026-11-03.png`), après masquage des informations du compte.
