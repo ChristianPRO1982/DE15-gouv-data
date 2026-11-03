@@ -1,0 +1,351 @@
+{
+  "name": "[N8N] Veille RGPD",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -576
+      ],
+      "id": "7ae8ca0d-1edf-49da-9277-a98442cccfc5",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5.6-sol",
+          "mode": "list",
+          "cachedResultName": "GPT-5.6-SOL"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=Tu réalises une veille réglementaire et technique pour le projet\nHudson Cab. Produis une synthèse en français, au format Markdown.\n\nPÉRIODE FOURNIE PAR N8N\n- Début inclus : {{ $json.date_debut }}\n- Fin exclue : {{ $json.date_fin }}\n\nUtilise exactement ces dates : ne recalcule pas le mois.\nRespecte les restrictions de domaines configurées dans le node.\n\nCONTEXTE\nHudson Cab Europe, établie à Paris, décide de la gestion des données\nRH de chauffeurs employés à New York. L’entrepôt utilise Snowflake\nEnterprise, hébergé dans la région AWS Paris.\n\nLes données comprennent identité, coordonnées, licence professionnelle,\ndates d’emploi, dépôt de rattachement et activité des chauffeurs :\nservices, horaires, heures travaillées, courses et recettes.\n\nLa gouvernance prévoit :\n- des accès par rôle et par dépôt ;\n- le masquage des données personnelles ;\n- une suppression cinq ans après la fin du contrat ;\n- une rétention Time Travel limitée à un jour ;\n- le retrait des fichiers du stage après chargement ;\n- des contrôles de qualité, des tâches planifiées et un audit des accès.\n\nSUJETS À SURVEILLER\n- RGPD : champ territorial, responsabilités, bases légales et transferts.\n- Gestion RH : conservation, archivage, minimisation et droits des personnes.\n- Obligations new-yorkaises pertinentes pour les données des chauffeurs.\n- Snowflake : accès, masquage, tags, catalogue, rétention, Fail-safe,\n  qualité, tâches planifiées et historique des accès.\n- Évolutions des conditions de sous-traitance et de sécurité pertinentes.\n\nRECHERCHE ET VÉRIFICATION\n1. Effectue une recherche web réelle dans le périmètre configuré.\n2. Ouvre les pages pertinentes : un extrait de moteur de recherche\n   ne suffit pas pour présenter une information comme vérifiée.\n3. Retient les publications ou mises à jour substantielles datées dans\n   la période fournie. Une date de consultation ou d’indexation ne\n   constitue pas une date de publication.\n4. Pour une page mise à jour, identifie le changement effectivement\n   documenté. Si tu ne peux pas déterminer ce qui a changé, indique-le\n   et ne présente pas la page comme une nouveauté confirmée.\n5. Distingue publication, adoption, entrée en vigueur et échéance.\n   Une publication du mois peut annoncer une application ultérieure.\n6. Recherche aussi les entrées en vigueur et échéances survenues\n   pendant la période, même si leur texte a été publié auparavant.\n   Présente-les dans une section distincte.\n7. Distingue obligation légale, recommandation, consultation publique,\n   annonce et évolution technique.\n8. Regroupe les publications traitant d’une même évolution pour éviter\n   les doublons. Écarte les contenus sans conséquence pour ce projet.\n9. Ne déduis pas automatiquement qu’une règle française s’applique aux\n   salariés new-yorkais. Compare les périmètres et points de départ\n   des durées de conservation.\n10. N’invente aucun texte, changement, article, date ou lien.\n    Signale les sources inaccessibles et les informations incertaines.\n11. Si la recherche web n’est pas disponible, indique clairement :\n    « Veille non exécutée : recherche web indisponible ».\n    Ne produis alors aucune nouveauté supposée.\n\nSORTIE ATTENDUE — MARKDOWN UNIQUEMENT\nN’utilise pas de bloc de code autour de la réponse.\n\n# Veille Hudson Cab — [période fournie]\n\n- **Période :** [début inclus ; fin exclue]\n- **Couverture :** [sources effectivement consultées]\n- **Statut :** recherche réalisée / partielle / non exécutée\n\n## Points à retenir\n\nAu maximum cinq points, classés par importance.\nPour chaque point : nouveauté concrète, conséquence pour Hudson Cab\net lien direct vers la source officielle.\nN’ajoute aucun point uniquement pour atteindre cinq éléments.\n\n## Publications et mises à jour du mois\n\nPour chaque évolution pertinente :\n\n### [Titre] — [priorité haute, moyenne ou faible]\n\n- **Organisme :**\n- **Nature :** obligation / recommandation / consultation / évolution technique\n- **Publication ou mise à jour :**\n- **Entrée en vigueur ou échéance :** [date ou « non précisée »]\n- **Nouveauté vérifiée :** [synthèse courte et factuelle]\n- **Conséquence pour Hudson Cab :** [donnée, table, rôle ou règle concerné]\n- **Action proposée :**\n- **Responsable proposé :** data / RH / sécurité / DPO / juriste\n- **Source :** [titre explicite](URL directe)\n- **Article ou section :** [si applicable]\n\n## Entrées en vigueur et échéances du mois\n\nPrésente uniquement les événements vérifiés survenus dans la période,\navec leur source et leur conséquence. Évite de répéter les fiches :\nrenvoie à la fiche correspondante si nécessaire.\n\n## Actions prioritaires\n\n| Priorité | Action | Responsable proposé | Échéance documentée |\n|---|---|---|---|\n\nN’invente pas de délai obligatoire. Une date suggérée doit être\nexplicitement présentée comme une proposition.\n\n## Couverture et limites\n\n| Source | Pages ou rubriques consultées | Résultat ou limite |\n|---|---|---|\n\nSignale les recherches infructueuses, pages inaccessibles et dates\nimpossibles à confirmer. Ne prétends pas que la recherche est exhaustive.\n\nSi aucune nouveauté pertinente n’est trouvée, écris :\n« Aucune nouveauté pertinente trouvée pour cette période dans les\nsources consultées. »\nDistingue ce résultat d’une recherche impossible ou partielle.\n\n## Questions à soumettre au DPO ou au juriste\n\nUniquement les questions soulevées par les résultats de cette période.\nS’il n’y en a pas, indique « Aucune nouvelle question identifiée »."
+            }
+          ]
+        },
+        "builtInTools": {
+          "webSearch": {
+            "searchContextSize": "high",
+            "allowedDomains": "cnil.fr, edpb.europa.eu, eur-lex.europa.eu, legifrance.gouv.fr, nysenate.gov, ag.ny.gov, docs.snowflake.com"
+          }
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        1344,
+        -672
+      ],
+      "id": "1c4bccf2-c04a-4901-aa82-9e0a42c9a82d",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "ZKI8pikW1dZatzK4",
+          "name": "N8N_cARThographie"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        224,
+        -672
+      ],
+      "id": "17937e8d-286c-4820-ad5b-8a8176bce5fc",
+      "name": "currentDate"
+    },
+    {
+      "parameters": {
+        "operation": "formatDate",
+        "date": "={{ $json.currentDate }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        448,
+        -672
+      ],
+      "id": "962c4362-e770-43e4-a063-7a5818b45b7a",
+      "name": "formatCurrentDate"
+    },
+    {
+      "parameters": {
+        "operation": "addToDate",
+        "magnitude": "={{ $json.currentDate }}",
+        "duration": -32,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        672,
+        -672
+      ],
+      "id": "35bfe736-93c4-45e5-a2a1-7a2f12b9e33d",
+      "name": "dateBefore"
+    },
+    {
+      "parameters": {
+        "operation": "formatDate",
+        "date": "={{ $json.newDate }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        896,
+        -672
+      ],
+      "id": "00ff3692-11bd-4ccc-9738-0c4001eb8dd0",
+      "name": "formatDateBefore"
+    },
+    {
+      "parameters": {
+        "toRecipients": "christian.martiny@outlook.com",
+        "subject": "Veille RGPD",
+        "bodyContent": "={{ $json.data }}",
+        "additionalFields": {
+          "bodyContentType": "html"
+        }
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        -576
+      ],
+      "id": "9aa904f2-daad-4154-b093-ae0cb4d4fc5f",
+      "name": "Send a message",
+      "webhookId": "9691997d-c9b5-41af-821a-a99eeb9c4c61",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "Z7zSDh4GbknTFow5",
+          "name": "christian.martiny@outlook.com Outlook"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d1540955-08a5-444f-aedf-93c06629a307",
+              "name": "date_debut",
+              "value": "={{ $json.formattedDate }}",
+              "type": "string"
+            },
+            {
+              "id": "351939f3-c6b2-45a9-bfaf-ab277353b526",
+              "name": "date_fin",
+              "value": "={{ $('formatCurrentDate').item.json.formattedDate }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1120,
+        -672
+      ],
+      "id": "9f5569e1-97a8-44ce-957b-aab71aea458c",
+      "name": "dates"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "months",
+              "triggerAtHour": 7
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        -768
+      ],
+      "id": "8e4f1442-263f-41cd-8370-1de1acf6f0ae",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "mode": "markdownToHtml",
+        "markdown": "={{ $json.output[0].content[0].text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.markdown",
+      "typeVersion": 1,
+      "position": [
+        1696,
+        -576
+      ],
+      "id": "f29b906c-bd42-42a0-9296-880d121851a3",
+      "name": "Markdown"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1c5b298c-c807-4a87-8c8f-7a6aa8f8d66f",
+              "name": "output[0].content[0].text",
+              "value": "***coucou***",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1408,
+        -480
+      ],
+      "id": "9460ac70-bda5-4626-8117-1a25369099e0",
+      "name": "test"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "currentDate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "currentDate": {
+      "main": [
+        [
+          {
+            "node": "formatCurrentDate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "formatCurrentDate": {
+      "main": [
+        [
+          {
+            "node": "dateBefore",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "dateBefore": {
+      "main": [
+        [
+          {
+            "node": "formatDateBefore",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "formatDateBefore": {
+      "main": [
+        [
+          {
+            "node": "dates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "dates": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "currentDate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "test": {
+      "main": [
+        [
+          {
+            "node": "Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Markdown": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "c8a16459-aa95-4fa6-85af-716ade01a5ea",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "82cef8ee402e9470a430a901a0c2e1b6ed76c886d43d62c1aedffbe0dfdb2f38"
+  },
+  "nodeGroups": [],
+  "id": "KRiwxgGWeMiS0oXv",
+  "tags": []
+}
