@@ -2,7 +2,8 @@
 -- Rejouable sans recréer les objets ni effacer les résultats de qualité.
 USE SECONDARY ROLES NONE;
 USE ROLE ACCOUNTADMIN;
-SET utilisateur_gouvernance = CURRENT_USER();
+-- La sous-requête permet l’expression ; les guillemets préservent le nom exact.
+SET utilisateur_gouvernance = (SELECT '"' || REPLACE(CURRENT_USER(), '"', '""') || '"');
 CREATE ROLE IF NOT EXISTS GOUVERNANCE
   COMMENT = 'Administre les règles et les métadonnées sans lecture des données RH';
 GRANT ROLE GOUVERNANCE TO USER IDENTIFIER($utilisateur_gouvernance);
