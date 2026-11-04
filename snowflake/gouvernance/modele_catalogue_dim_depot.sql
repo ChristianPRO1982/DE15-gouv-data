@@ -7,6 +7,7 @@
 -- À savoir : une table recréée (CREATE OR REPLACE TABLE) perd ses descriptions et ses tags.
 -- C'est pourquoi le catalogue s'écrit dans des fichiers SQL rejouables, et non à la main dans l'interface.
 
+USE SECONDARY ROLES NONE;
 USE ROLE TRANSFORMER;
 USE WAREHOUSE NYC_TAXI_WH;
 
@@ -33,5 +34,5 @@ ALTER TABLE NYC_TAXI.MARTS.DIM_DEPOT SET TAG
 SELECT column_name, comment FROM NYC_TAXI.INFORMATION_SCHEMA.COLUMNS
 WHERE table_schema = 'MARTS' AND table_name = 'DIM_DEPOT' ORDER BY ordinal_position;
 
-SELECT level, column_name, tag_name, tag_value
+SELECT column_name, tag_name, tag_value
 FROM TABLE(NYC_TAXI.INFORMATION_SCHEMA.TAG_REFERENCES_ALL_COLUMNS('NYC_TAXI.MARTS.DIM_DEPOT', 'table'));

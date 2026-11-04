@@ -56,13 +56,13 @@ L’installation est déjà validée. Pour l’étape 3, commencer au point 3 ci
 
 ### Chargement RH — étape 3
 
-**État au 4 novembre 2026 :** préparation locale terminée ; exécution Snowflake à confirmer par les résultats Snowsight. Les deux CSV sont présents dans `data/`, ignorés et non suivis par Git ; aucun ajout n’apparaît dans l’historique local accessible. Leur lecture locale donne 400 chauffeurs, 25 951 services, 25 933 identifiants de service distincts et 914 groupes mensuels. Ces contrôles locaux ne prouvent pas le chargement dans Snowflake.
+**État au 4 novembre 2026 :** étape 3 terminée ; chargement, relance corrigée, construction et contrôle final validés à partir des résultats Snowsight transmis par le titulaire. Les deux CSV sont présents dans `data/`, ignorés et non suivis par Git ; aucun ajout n’apparaît dans l’historique local accessible. Leur lecture locale donne 400 chauffeurs, 25 951 services, 25 933 identifiants de service distincts et 914 groupes mensuels. Ces contrôles locaux ne prouvent pas le chargement dans Snowflake.
 
 Dans Snowsight, commencer par `USE SECONDARY ROLES NONE;`, puis `USE ROLE TRANSFORMER;` et `USE WAREHOUSE NYC_TAXI_WH;`. Exécuter chaque script en entier dans l’ordre ci-dessus et vérifier le résultat avant de passer au suivant.
 
-**Préparation Snowflake confirmée le 4 novembre 2026 :** après une première vérification signalant l’absence ou l’inaccessibilité de `RAW.DRIVERS`, le titulaire a exécuté les instructions de préparation par blocs. Les résultats transmis confirment le format `CSV_RH`, les deux tables RAW à 0 ligne et le stage `RH_STAGE` avec répertoire activé, tous propriétaires `TRANSFORMER`. Le dépôt des CSV est confirmé ci-dessous ; leur chargement reste à confirmer.
+**Préparation Snowflake confirmée le 4 novembre 2026 :** après une première vérification signalant l’absence ou l’inaccessibilité de `RAW.DRIVERS`, le titulaire a exécuté les instructions de préparation par blocs. Les résultats transmis confirment le format `CSV_RH`, les deux tables RAW à 0 ligne et le stage `RH_STAGE` avec répertoire activé, tous propriétaires `TRANSFORMER`. Le dépôt et le chargement des CSV sont confirmés ci-dessous.
 
-**Dépôt des CSV confirmé le 4 novembre 2026 :** le résultat `LIST` transmis montre `rh_stage/drivers.csv` (43 541 octets) et `rh_stage/driver_shifts.csv` (1 277 306 octets). Les deux fichiers sont à la racine du stage ; leur copie dans les tables RAW reste à confirmer.
+**Dépôt des CSV confirmé le 4 novembre 2026 :** le résultat `LIST` transmis montre `rh_stage/drivers.csv` (43 541 octets) et `rh_stage/driver_shifts.csv` (1 277 306 octets). Les deux fichiers étaient à la racine du stage avant leur copie dans les tables RAW et leur retrait confirmé ci-dessous.
 
 Après `chargement_rh_1_preparer.sql`, vérifier que `RH_STAGE` existe. Dans le menu du profil Snowsight, sélectionner `TRANSFORMER` pour le dépôt via l’interface. Ouvrir **Ingestion → Add Data → Load files into a Stage**, sélectionner `data/drivers.csv` et `data/driver_shifts.csv`, puis la base `NYC_TAXI`, le schéma `RAW` et le stage `RH_STAGE`. Laisser le chemin de destination vide et cliquer sur **Upload**. Vérifier les deux fichiers avec `LIST @NYC_TAXI.RAW.RH_STAGE;`, puis exécuter `chargement_rh_2_copier.sql` : le résultat doit donner 400 chauffeurs et 25 951 services, et le stage doit être vide. Relancer ce second script sans redéposer les fichiers et vérifier que les volumes ne changent pas. Poursuivre ensuite avec les tables, les vues et les trois scripts MARTS, dans l’ordre indiqué.
 
@@ -75,18 +75,18 @@ Le script de vérification affiche uniquement le contexte de session, les volume
 
 | Objet | Lignes attendues avant purge | Résultat Snowflake |
 |---|---:|---|
-| `RAW.DRIVERS` | 400 | 400 — confirmé le 4 novembre 2026 après chargement initial |
-| `RAW.DRIVER_SHIFTS` | 25 951 | 25 951 — confirmé le 4 novembre 2026 après chargement initial |
-| `STAGING.STG_RH__DRIVER_SHIFTS` | 25 933 | À confirmer |
-| `MARTS.DIM_DEPOT` | 3 | À confirmer |
-| `MARTS.DIM_DRIVER` | 400 | À confirmer |
-| `MARTS.MART_DRIVER_MONTHLY` | 914 | À confirmer |
+| `RAW.DRIVERS` | 400 | 400 — OK, contrôle final du 4 novembre 2026 |
+| `RAW.DRIVER_SHIFTS` | 25 951 | 25 951 — OK, contrôle final du 4 novembre 2026 |
+| `STAGING.STG_RH__DRIVER_SHIFTS` | 25 933 | 25 933 — OK, contrôle final du 4 novembre 2026 |
+| `MARTS.DIM_DEPOT` | 3 | 3 — OK, contrôle final du 4 novembre 2026 |
+| `MARTS.DIM_DRIVER` | 400 | 400 — OK, contrôle final du 4 novembre 2026 |
+| `MARTS.MART_DRIVER_MONTHLY` | 914 | 914 — OK, contrôle final du 4 novembre 2026 |
 
 **Chargement initial confirmé le 4 novembre 2026 :** résultats transmis par le titulaire : 400 chauffeurs, 25 951 services et `LIST @NYC_TAXI.RAW.RH_STAGE;` sans résultat. Le stage est vide après la copie.
 
 **Relance diagnostiquée le 4 novembre 2026 :** erreur reçue : `Remote file '@rh_stage/drivers.csv' was not found.` Les fichiers avaient été retirés par `PURGE = TRUE`, mais `FILES` exigeait toujours leur présence. Le contrôle séparé confirme des volumes inchangés (400 et 25 951) et un stage vide. Le script remplace désormais `FILES` par un `PATTERN` distinct pour chaque CSV, en conservant la purge et l’arrêt sur erreur de données. Comportement attendu sur stage vide : `Copy executed with 0 files processed.` pour chaque copie. [Référence Snowflake : COPY INTO](https://docs.snowflake.com/en/sql-reference/sql/copy-into-table). La version corrigée a ensuite été exécutée dans Snowsight sans redéposer les fichiers : le titulaire confirme le 4 novembre 2026 que les copies passent, avec 400 chauffeurs, 25 951 services et un stage vide. La relance est validée sur ces résultats.
 
-**Validation partielle :** chargement et relance corrigée validés. Restent la construction des tables MARTS et des vues STAGING, puis les six lignes du contrôle final avec confirmation du stage vide. Reporter ensuite la date et les résultats constatés ici et cocher les cases correspondantes du plan local. En cas d’erreur, de statut `ECART` ou de fichier restant sur le stage, résoudre le problème avant de poursuivre. Aucune purge ni politique de gouvernance n’est exécutée à cette étape.
+**Validation complète le 4 novembre 2026 :** contrôle final transmis par le titulaire avec le rôle `TRANSFORMER` et le warehouse `NYC_TAXI_WH` : les six volumes du tableau sont conformes (`OK`) et le `LIST` du stage ne renvoie aucun résultat. Chargement, relance corrigée sans ajout de lignes, vues STAGING et tables MARTS validés ; toutes les cases de l’étape 3 du plan local sont cochées. Aucune purge ni politique de gouvernance n’a été exécutée à cette étape.
 
 Consulter [GUIDE_BRIEF_GOUVERNANCE.md](GUIDE_BRIEF_GOUVERNANCE.md) pour les étapes suivantes et [CONTRAT_GOUVERNANCE.md](CONTRAT_GOUVERNANCE.md) pour les règles imposées.
 
@@ -126,3 +126,22 @@ Outil choisi par le titulaire : **ChatGPT web avec recherche web**, avec revue m
 **À terminer :** capture réelle dans `docs/`, confirmation de la répartition et mécanisme d’alerte. Une revue manuelle n’est pas un abonnement : l’exigence du brief de recevoir les nouveautés reste à satisfaire par un abonnement complémentaire ou une adaptation validée par le formateur. Aucun abonnement, rappel ni capture n’a été créé ici ; la validation complète du jour 1 matin reste ouverte sur ces points.
 
 Aucun commit ni push n’est réalisé pendant ce travail.
+
+
+### Installation de la gouvernance et catalogue — étape 4
+
+Préparation locale réalisée le 4 novembre 2026 ; exécution Snowflake et capture encore attendues. Aucun masquage ni filtre de lignes créé à cette étape. La carte des propriétaires et privilèges est dans [ACCES.md](docs/ACCES.md).
+
+Dans Snowsight, exécuter chaque fichier en entier et vérifier ses résultats avant le suivant :
+
+1. Étudier et exécuter `exemples/00_bac_a_sable.sql`, puis `exemples/01_role_gouvernance.sql`. Ils utilisent leur base `EXEMPLE_GOUV`, leur warehouse `EXEMPLE_WH` et les rôles `EX_*` ; ne pas substituer les noms du projet. Attendu : six clients puis cinq colonnes taguées, aucun SELECT pour EX_GOUVERNANCE.
+2. [01_gouvernance.sql](snowflake/gouvernance/01_gouvernance.sql) : commence avec ACCOUNTADMIN puis passe à GOUVERNANCE. Attendu : trois tags appartenant à GOUVERNANCE et table QUALITE_RESULTATS vide au premier passage. TRANSFORMER reçoit USAGE/CREATE VIEW sur le schéma, APPLY sur chacun des trois tags, INSERT/SELECT sur les résultats. GOUVERNANCE ne reçoit aucun SELECT RH.
+3. [Modèle DIM_DEPOT](snowflake/gouvernance/modele_catalogue_dim_depot.sql) : TRANSFORMER documente le référentiel non personnel, sensibilité interne, conservation sans limite du référentiel.
+4. [RAW.DRIVERS](snowflake/rh/catalogue/catalogue_raw_drivers.sql), puis [DIM_DRIVER](snowflake/rh/catalogue/catalogue_dim_driver.sql) : fiches complètes, douze colonnes décrites chacune.
+5. [RAW.DRIVER_SHIFTS](snowflake/rh/catalogue/catalogue_raw_driver_shifts.sql), puis [MART_DRIVER_MONTHLY](snowflake/rh/catalogue/catalogue_mart_driver_monthly.sql) : fiches courtes ; `driver_name` porte le tag `nom`.
+6. [Vérification du catalogue](snowflake/rh/catalogue/verification_catalogue.sql) : cinq tables décrites ; 28 colonnes décrites sur les trois fiches complètes ; aucun manque de description ; 18 affectations personnelles attendues avec statut OK ; sensibilité confidentielle et durée de cinq ans après départ sur les quatre tables RH, interne et durée du référentiel sur DIM_DEPOT. Examiner également les droits avec ACCOUNTADMIN.
+7. Rejouer l’installation et les cinq fiches, puis le contrôle : résultats inchangés, aucun objet de données recréé et aucun historique de qualité effacé. Capturer dans Snowsight les tags d’une table (Details), sans lignes de chauffeurs ; enregistrer par exemple `docs/tags_dim_driver.png`. Reporter les résultats réels dans le plan et ACCES.md ; ne cocher l’exécution qu’après confirmation.
+
+Le tag DUREE_CONSERVATION décrit une règle ; il n’applique ni purge ni rétention Time Travel. Ces mécanismes seront installés au jour 3. Les catégories professionnelles absentes de la taxonomie du contrat restent explicitement à clarifier, selon le choix du titulaire : la couverture des tags personnels est partielle, même si les 18 contrôles prévus passent. Voir [REGISTRE.md](docs/REGISTRE.md). `identifiant_interne` n’accordera pas automatiquement de visibilité : l’exception prévue au jour 2 concerne précisément `driver_id`, pas `shift_id`.
+
+Le modèle DIM_DEPOT utilise désormais les colonnes documentées de [TAG_REFERENCES_ALL_COLUMNS](https://docs.snowflake.com/en/sql-reference/functions/tag_references_all_columns) : `column_name`, `tag_name`, `tag_value`. La colonne `level` du kit n’appartient pas à cette sortie. Les tags de table sont hérités par les colonnes ; ce contrôle doit être lancé avec TRANSFORMER, propriétaire des tables.

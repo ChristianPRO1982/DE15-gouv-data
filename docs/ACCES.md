@@ -1,6 +1,6 @@
 # Les accès — carte des droits et cahier de tests
 
-Préparé à partir du modèle le 3 novembre 2026. La carte des droits sera renseignée après création/vérification des objets ; les tests attendus seront écrits au jour 2 avant les politiques. Aucun résultat « obtenu » n’est encore disponible.
+Préparé à partir du modèle le 3 novembre 2026. Carte complétée le 4 novembre 2026 à partir des scripts ; déploiement et droits effectifs à vérifier dans Snowsight ; les tests attendus seront écrits au jour 2 avant les politiques. Aucun résultat « obtenu » n’est encore disponible.
 
 - **Partie 1, jours 1 et 2** : la carte des droits, complétée au fur et à mesure que vous créez rôles et objets ;
 - **Partie 2, jour 2** : le cahier de tests, « attendu » écrit avant les politiques, « obtenu » après.
@@ -19,31 +19,36 @@ Le propriétaire d'un objet est le rôle qui l'a créé.
 
 | Objet | Propriétaire |
 |---|---|
-| Tables de `RAW` et de `MARTS` | le rôle des outils |
-| Schéma `GOUVERNANCE` | |
-| Tags | |
-| Politiques de masquage | |
-| Politique d'accès par ligne | |
-| Table `ACCES_DEPOT` | |
-| Table `QUALITE_RESULTATS` | |
-| Vue `V_CATALOGUE` | |
+| Tables de `RAW` et de `MARTS` | `TRANSFORMER` (étape 3 confirmée) |
+| Schéma `GOUVERNANCE` | `GOUVERNANCE`, transfert prévu dans `01_gouvernance.sql` |
+| Tags | `GOUVERNANCE`, création prévue étape 4 |
+| Politiques de masquage | `GOUVERNANCE`, prévues jour 2 |
+| Politique d'accès par ligne | `GOUVERNANCE`, prévue jour 2 |
+| Table `ACCES_DEPOT` | `GOUVERNANCE`, prévue jour 2 |
+| Table `QUALITE_RESULTATS` | `GOUVERNANCE`, création prévue étape 4 |
+| Vue `V_CATALOGUE` | `TRANSFORMER`, création prévue jour 3 |
 
 ### Qui fait quoi, avec quel droit
 
 | Action | Rôle qui la fait | Privilège nécessaire | Accordé par |
 |---|---|---|---|
 | Créer un tag | `GOUVERNANCE` | `CREATE TAG` sur le schéma, ou en être propriétaire | `ACCOUNTADMIN` |
-| Poser un tag sur une colonne de `DIM_DRIVER` | | | |
-| Créer une politique de masquage | | | |
-| Attacher une politique de masquage à un tag | | | |
-| Ajouter une politique d'accès par ligne à une table | | | |
-| Écrire une ligne dans `QUALITE_RESULTATS` | | | |
-| Lire `DIM_DRIVER` | | | |
-| Exécuter une requête | chaque rôle | | |
+| Poser un tag sur une colonne de `DIM_DRIVER` | `TRANSFORMER` | Propriété de la table + `APPLY` sur le tag + accès base/schémas | `GOUVERNANCE` accorde APPLY et USAGE sur son schéma |
+| Créer une politique de masquage | `GOUVERNANCE` | Propriété du schéma (ou CREATE MASKING POLICY) | `ACCOUNTADMIN` transfère le schéma ; création jour 2 |
+| Attacher une politique de masquage à un tag | `GOUVERNANCE` | Propriété du tag + privilège global APPLY MASKING POLICY | `ACCOUNTADMIN` ; attachement jour 2 |
+| Ajouter une politique d'accès par ligne à une table | `GOUVERNANCE` | APPLY ROW ACCESS POLICY sur le compte, accès base/schéma | `ACCOUNTADMIN` ; attachement jour 2 |
+| Écrire une ligne dans `QUALITE_RESULTATS` | `TRANSFORMER` | INSERT sur la table, USAGE sur base/schéma | `GOUVERNANCE` ; SELECT également accordé pour contrôler |
+| Lire `DIM_DRIVER` | `TRANSFORMER` ; rôles métier prévus jour 2 | Propriété ou SELECT, USAGE base/schéma et warehouse | Propriété TRANSFORMER ; droits métier à créer jour 2 |
+| Exécuter une requête | chaque rôle | USAGE warehouse et droits sur objets visés | `ACCOUNTADMIN` pour NYC_TAXI_WH |
+| Créer la future vue de catalogue | `TRANSFORMER` | CREATE VIEW et USAGE sur GOUVERNANCE ; accès aux sources | `GOUVERNANCE` |
 
 ### Ce que cette carte permet à un rôle de défaire
 
-Pour chaque rôle qui peut poser ou retirer un tag, ou détacher une politique : que pourrait-il démasquer ? Est-ce acceptable, et qui le surveille ?
+`TRANSFORMER`, propriétaire des tables et autorisé à appliquer les tags, peut retirer un tag et compromettre le futur masquage par tag. `GOUVERNANCE` peut changer les règles ou les détacher avec ses privilèges globaux ; il ne reçoit aucun SELECT sur RAW, STAGING ou MARTS, ni aucun rôle de lecture en héritage. Les administrateurs peuvent changer les droits : les futures politiques doivent aussi tester leur lecture.
+
+Ces pouvoirs sont nécessaires au montage pédagogique ; l’audit des lectures et changements reste à mettre en place au jour 3. Les droits métier et les politiques ne sont pas créés à cette étape. Contrôler `SHOW GRANTS TO ROLE GOUVERNANCE` avec ACCOUNTADMIN, y compris les éventuels rôles hérités préexistants ; `CREATE IF NOT EXISTS` ne supprime pas d’anciens droits.
+
+Sources vérifiées le 4 novembre 2026 : [privilèges Snowflake](https://docs.snowflake.com/en/user-guide/security-access-control-privileges), [gestion des tags](https://docs.snowflake.com/en/user-guide/object-tagging/work). Résultats effectifs : en attente des sorties Snowsight de `01_gouvernance.sql` et `verification_catalogue.sql`.
 
 ---
 
