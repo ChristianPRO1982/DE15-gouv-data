@@ -20,12 +20,12 @@ Le propriétaire d'un objet est le rôle qui l'a créé.
 | Objet | Propriétaire |
 |---|---|
 | Tables de `RAW` et de `MARTS` | `TRANSFORMER` (étape 3 confirmée) |
-| Schéma `GOUVERNANCE` | `GOUVERNANCE`, transfert prévu dans `01_gouvernance.sql` |
-| Tags | `GOUVERNANCE`, création prévue étape 4 |
+| Schéma `GOUVERNANCE` | `GOUVERNANCE`, transfert confirmé le 4 novembre 2026 |
+| Tags | `GOUVERNANCE`, propriété confirmée le 4 novembre 2026 |
 | Politiques de masquage | `GOUVERNANCE`, prévues jour 2 |
 | Politique d'accès par ligne | `GOUVERNANCE`, prévue jour 2 |
 | Table `ACCES_DEPOT` | `GOUVERNANCE`, prévue jour 2 |
-| Table `QUALITE_RESULTATS` | `GOUVERNANCE`, création prévue étape 4 |
+| Table `QUALITE_RESULTATS` | `GOUVERNANCE`, propriété confirmée le 4 novembre 2026 |
 | Vue `V_CATALOGUE` | `TRANSFORMER`, création prévue jour 3 |
 
 ### Qui fait quoi, avec quel droit
@@ -48,7 +48,7 @@ Le propriétaire d'un objet est le rôle qui l'a créé.
 
 Ces pouvoirs sont nécessaires au montage pédagogique ; l’audit des lectures et changements reste à mettre en place au jour 3. Les droits métier et les politiques ne sont pas créés à cette étape. Contrôler `SHOW GRANTS TO ROLE GOUVERNANCE` avec ACCOUNTADMIN, y compris les éventuels rôles hérités préexistants ; `CREATE IF NOT EXISTS` ne supprime pas d’anciens droits.
 
-Sources vérifiées le 4 novembre 2026 : [privilèges Snowflake](https://docs.snowflake.com/en/user-guide/security-access-control-privileges), [gestion des tags](https://docs.snowflake.com/en/user-guide/object-tagging/work). Résultats effectifs : en attente des sorties Snowsight de `01_gouvernance.sql` et `verification_catalogue.sql`.
+Sources vérifiées le 4 novembre 2026 : [privilèges Snowflake](https://docs.snowflake.com/en/user-guide/security-access-control-privileges), [gestion des tags](https://docs.snowflake.com/en/user-guide/object-tagging/work). Résultats de `01_gouvernance.sql` reçus et conformes le 4 novembre 2026 : propriétés du schéma, des trois tags et de QUALITE_RESULTATS, droits globaux de GOUVERNANCE, droits de TRANSFORMER sur les tags, les résultats et la création de vues. Aucun SELECT RH ni rôle de lecture hérité dans les attributions fournies de GOUVERNANCE ; NB_MESURES = 0. Le contrôle du catalogue reste à exécuter.
 
 ---
 
