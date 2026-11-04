@@ -60,25 +60,33 @@ L’installation est déjà validée. Pour l’étape 3, commencer au point 3 ci
 
 Dans Snowsight, commencer par `USE SECONDARY ROLES NONE;`, puis `USE ROLE TRANSFORMER;` et `USE WAREHOUSE NYC_TAXI_WH;`. Exécuter chaque script en entier dans l’ordre ci-dessus et vérifier le résultat avant de passer au suivant.
 
-Après `chargement_rh_1_preparer.sql`, vérifier que `RH_STAGE` existe. Avec `TRANSFORMER`, ouvrir le stage `NYC_TAXI.RAW.RH_STAGE` dans l’explorateur de bases de Snowsight et y déposer `data/drivers.csv` et `data/driver_shifts.csv`. Vérifier les deux fichiers avec `LIST @NYC_TAXI.RAW.RH_STAGE;`, puis exécuter `chargement_rh_2_copier.sql` : le résultat doit donner 400 chauffeurs et 25 951 services, et le stage doit être vide. Relancer ce second script sans redéposer les fichiers et vérifier que les volumes ne changent pas. Poursuivre ensuite avec les tables, les vues et les trois scripts MARTS, dans l’ordre indiqué.
+**Préparation Snowflake confirmée le 4 novembre 2026 :** après une première vérification signalant l’absence ou l’inaccessibilité de `RAW.DRIVERS`, le titulaire a exécuté les instructions de préparation par blocs. Les résultats transmis confirment le format `CSV_RH`, les deux tables RAW à 0 ligne et le stage `RH_STAGE` avec répertoire activé, tous propriétaires `TRANSFORMER`. Le dépôt des CSV est confirmé ci-dessous ; leur chargement reste à confirmer.
+
+**Dépôt des CSV confirmé le 4 novembre 2026 :** le résultat `LIST` transmis montre `rh_stage/drivers.csv` (43 541 octets) et `rh_stage/driver_shifts.csv` (1 277 306 octets). Les deux fichiers sont à la racine du stage ; leur copie dans les tables RAW reste à confirmer.
+
+Après `chargement_rh_1_preparer.sql`, vérifier que `RH_STAGE` existe. Dans le menu du profil Snowsight, sélectionner `TRANSFORMER` pour le dépôt via l’interface. Ouvrir **Ingestion → Add Data → Load files into a Stage**, sélectionner `data/drivers.csv` et `data/driver_shifts.csv`, puis la base `NYC_TAXI`, le schéma `RAW` et le stage `RH_STAGE`. Laisser le chemin de destination vide et cliquer sur **Upload**. Vérifier les deux fichiers avec `LIST @NYC_TAXI.RAW.RH_STAGE;`, puis exécuter `chargement_rh_2_copier.sql` : le résultat doit donner 400 chauffeurs et 25 951 services, et le stage doit être vide. Relancer ce second script sans redéposer les fichiers et vérifier que les volumes ne changent pas. Poursuivre ensuite avec les tables, les vues et les trois scripts MARTS, dans l’ordre indiqué.
 
 - Le format `CSV_RH` décrit la lecture des CSV : en-tête ignoré et champs éventuellement entourés de guillemets. RAW conserve les espaces présents dans la source.
 - Le stage `RH_STAGE` reçoit temporairement les fichiers avant leur import dans les tables.
-- `COPY INTO` copie les colonnes et ajoute les métadonnées du fichier et du chargement. Son historique évite de recharger les mêmes fichiers lors de la relance prévue ici ; ne pas utiliser `FORCE = TRUE`.
+- `COPY INTO` copie les colonnes et ajoute les métadonnées du fichier et du chargement. Chaque `PATTERN` sélectionne le nom exact du CSV destiné à sa table. Après purge, un stage vide ne fournit aucun fichier correspondant : la relance doit traiter zéro fichier. L’historique de chargement protège aussi contre le rechargement des mêmes fichiers dans sa fenêtre de suivi ; ne pas utiliser `FORCE = TRUE`.
 - `PURGE = TRUE` demande le retrait des fichiers du stage après copie réussie. Le résultat de `LIST` doit confirmer le retrait effectif des deux fichiers.
 
 Le script de vérification affiche uniquement le contexte de session, les volumes et leur statut, puis le contenu du stage. Il doit produire six lignes `OK` et aucun fichier sur le stage :
 
 | Objet | Lignes attendues avant purge | Résultat Snowflake |
 |---|---:|---|
-| `RAW.DRIVERS` | 400 | À confirmer |
-| `RAW.DRIVER_SHIFTS` | 25 951 | À confirmer |
+| `RAW.DRIVERS` | 400 | 400 — confirmé le 4 novembre 2026 après chargement initial |
+| `RAW.DRIVER_SHIFTS` | 25 951 | 25 951 — confirmé le 4 novembre 2026 après chargement initial |
 | `STAGING.STG_RH__DRIVER_SHIFTS` | 25 933 | À confirmer |
 | `MARTS.DIM_DEPOT` | 3 | À confirmer |
 | `MARTS.DIM_DRIVER` | 400 | À confirmer |
 | `MARTS.MART_DRIVER_MONTHLY` | 914 | À confirmer |
 
-**Validation en attente :** transmettre les résultats agrégés du chargement initial et de sa relance, les six lignes du contrôle final et la confirmation du stage vide. Reporter ensuite la date et les résultats constatés ici et cocher les cases correspondantes du plan local. En cas d’erreur, de statut `ECART` ou de fichier restant sur le stage, résoudre le problème avant de poursuivre. Aucune purge ni politique de gouvernance n’est exécutée à cette étape.
+**Chargement initial confirmé le 4 novembre 2026 :** résultats transmis par le titulaire : 400 chauffeurs, 25 951 services et `LIST @NYC_TAXI.RAW.RH_STAGE;` sans résultat. Le stage est vide après la copie.
+
+**Relance diagnostiquée le 4 novembre 2026 :** erreur reçue : `Remote file '@rh_stage/drivers.csv' was not found.` Les fichiers avaient été retirés par `PURGE = TRUE`, mais `FILES` exigeait toujours leur présence. Le contrôle séparé confirme des volumes inchangés (400 et 25 951) et un stage vide. Le script remplace désormais `FILES` par un `PATTERN` distinct pour chaque CSV, en conservant la purge et l’arrêt sur erreur de données. Comportement attendu sur stage vide : `Copy executed with 0 files processed.` pour chaque copie. [Référence Snowflake : COPY INTO](https://docs.snowflake.com/en/sql-reference/sql/copy-into-table). La version corrigée a ensuite été exécutée dans Snowsight sans redéposer les fichiers : le titulaire confirme le 4 novembre 2026 que les copies passent, avec 400 chauffeurs, 25 951 services et un stage vide. La relance est validée sur ces résultats.
+
+**Validation partielle :** chargement et relance corrigée validés. Restent la construction des tables MARTS et des vues STAGING, puis les six lignes du contrôle final avec confirmation du stage vide. Reporter ensuite la date et les résultats constatés ici et cocher les cases correspondantes du plan local. En cas d’erreur, de statut `ECART` ou de fichier restant sur le stage, résoudre le problème avant de poursuivre. Aucune purge ni politique de gouvernance n’est exécutée à cette étape.
 
 Consulter [GUIDE_BRIEF_GOUVERNANCE.md](GUIDE_BRIEF_GOUVERNANCE.md) pour les étapes suivantes et [CONTRAT_GOUVERNANCE.md](CONTRAT_GOUVERNANCE.md) pour les règles imposées.
 
