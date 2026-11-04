@@ -42,7 +42,7 @@ Le warehouse attendu est `NYC_TAXI_WH`, de taille `XSMALL`, avec suspension auto
 
 ### Ordre des scripts fournis pour la suite
 
-Le chargement des données appartient à la suite du plan. Ne pas le lancer pour valider uniquement la préparation de l’environnement.
+L’installation est déjà validée. Pour l’étape 3, commencer au point 3 ci-dessous ; les points 1 et 2 servent à rejouer la préparation sur un compte vide.
 
 1. `snowflake/00_installation.sql` — `ACCOUNTADMIN`.
 2. `snowflake/01_verification_installation.sql` — vérifications de l’installation.
@@ -52,6 +52,33 @@ Le chargement des données appartient à la suite du plan. Ne pas le lancer pour
 6. `snowflake/rh/00_tables_rh.sql`.
 7. `snowflake/rh/staging/stg_rh__drivers.sql`, puis `stg_rh__driver_shifts.sql`.
 8. `snowflake/rh/marts/dim_depot.sql`, puis `dim_driver.sql`, puis `mart_driver_monthly.sql`.
+9. [snowflake/rh/verification_chargement_rh.sql](snowflake/rh/verification_chargement_rh.sql) — contrôle final avant toute purge.
+
+### Chargement RH — étape 3
+
+**État au 4 novembre 2026 :** préparation locale terminée ; exécution Snowflake à confirmer par les résultats Snowsight. Les deux CSV sont présents dans `data/`, ignorés et non suivis par Git ; aucun ajout n’apparaît dans l’historique local accessible. Leur lecture locale donne 400 chauffeurs, 25 951 services, 25 933 identifiants de service distincts et 914 groupes mensuels. Ces contrôles locaux ne prouvent pas le chargement dans Snowflake.
+
+Dans Snowsight, commencer par `USE SECONDARY ROLES NONE;`, puis `USE ROLE TRANSFORMER;` et `USE WAREHOUSE NYC_TAXI_WH;`. Exécuter chaque script en entier dans l’ordre ci-dessus et vérifier le résultat avant de passer au suivant.
+
+Après `chargement_rh_1_preparer.sql`, vérifier que `RH_STAGE` existe. Avec `TRANSFORMER`, ouvrir le stage `NYC_TAXI.RAW.RH_STAGE` dans l’explorateur de bases de Snowsight et y déposer `data/drivers.csv` et `data/driver_shifts.csv`. Vérifier les deux fichiers avec `LIST @NYC_TAXI.RAW.RH_STAGE;`, puis exécuter `chargement_rh_2_copier.sql` : le résultat doit donner 400 chauffeurs et 25 951 services, et le stage doit être vide. Relancer ce second script sans redéposer les fichiers et vérifier que les volumes ne changent pas. Poursuivre ensuite avec les tables, les vues et les trois scripts MARTS, dans l’ordre indiqué.
+
+- Le format `CSV_RH` décrit la lecture des CSV : en-tête ignoré et champs éventuellement entourés de guillemets. RAW conserve les espaces présents dans la source.
+- Le stage `RH_STAGE` reçoit temporairement les fichiers avant leur import dans les tables.
+- `COPY INTO` copie les colonnes et ajoute les métadonnées du fichier et du chargement. Son historique évite de recharger les mêmes fichiers lors de la relance prévue ici ; ne pas utiliser `FORCE = TRUE`.
+- `PURGE = TRUE` demande le retrait des fichiers du stage après copie réussie. Le résultat de `LIST` doit confirmer le retrait effectif des deux fichiers.
+
+Le script de vérification affiche uniquement le contexte de session, les volumes et leur statut, puis le contenu du stage. Il doit produire six lignes `OK` et aucun fichier sur le stage :
+
+| Objet | Lignes attendues avant purge | Résultat Snowflake |
+|---|---:|---|
+| `RAW.DRIVERS` | 400 | À confirmer |
+| `RAW.DRIVER_SHIFTS` | 25 951 | À confirmer |
+| `STAGING.STG_RH__DRIVER_SHIFTS` | 25 933 | À confirmer |
+| `MARTS.DIM_DEPOT` | 3 | À confirmer |
+| `MARTS.DIM_DRIVER` | 400 | À confirmer |
+| `MARTS.MART_DRIVER_MONTHLY` | 914 | À confirmer |
+
+**Validation en attente :** transmettre les résultats agrégés du chargement initial et de sa relance, les six lignes du contrôle final et la confirmation du stage vide. Reporter ensuite la date et les résultats constatés ici et cocher les cases correspondantes du plan local. En cas d’erreur, de statut `ECART` ou de fichier restant sur le stage, résoudre le problème avant de poursuivre. Aucune purge ni politique de gouvernance n’est exécutée à cette étape.
 
 Consulter [GUIDE_BRIEF_GOUVERNANCE.md](GUIDE_BRIEF_GOUVERNANCE.md) pour les étapes suivantes et [CONTRAT_GOUVERNANCE.md](CONTRAT_GOUVERNANCE.md) pour les règles imposées.
 
