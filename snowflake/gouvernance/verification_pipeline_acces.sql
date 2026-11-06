@@ -1,15 +1,31 @@
--- Étape 5 : tests à exécuter dans Snowsight ; ne pas inscrire de résultat supposé.
--- Sorties : statuts et volumes uniquement ; aucune valeur personnelle ni empreinte affichée.
--- À exécuter en entier dans une même session et le même jour ; aucun CSV n’est rechargé.
--- Si le jour change, TENURE_YEARS peut légitimement évoluer : reprendre la référence.
-USE SECONDARY ROLES NONE;
-USE ROLE TRANSFORMER;
-USE WAREHOUSE NYC_TAXI_WH;
-SET (e5_avant_dim, e5_avant_mensuel, e5_avant_depot) = (
- SELECT (SELECT HASH_AGG(*) FROM NYC_TAXI.MARTS.DIM_DRIVER),
-        (SELECT HASH_AGG(*) FROM NYC_TAXI.MARTS.MART_DRIVER_MONTHLY),
-        (SELECT HASH_AGG(*) FROM NYC_TAXI.MARTS.DIM_DEPOT)
-);
+-- Étape 5 : lancer EN ENTIER ; un seul tableau final de quatre contrôles.
+-- Reconstruit les deux vues STAGING et remplit les trois MARTS avec TRANSFORMER.
+-- Ne recharge aucun CSV ; conserve les tables, descriptions, tags et politiques.
+-- Les références avant/après sont locales au bloc ; aucune valeur personnelle affichée.
+-- TENURE_YEARS dépend de CURRENT_DATE : une table construite un jour précédent peut
+-- changer légitimement. Une seconde exécution vérifie alors la stabilité à date identique.
+-- Les contrôles catalogue/politiques et la synthèse des rôles sont à rejouer ensuite.
+EXECUTE IMMEDIATE $$
+DECLARE
+  role_initial VARCHAR DEFAULT CURRENT_ROLE();
+  commande VARCHAR;
+  avant_dim NUMBER;
+  avant_mensuel NUMBER;
+  avant_depot NUMBER;
+  statut VARCHAR;
+  nb_differences NUMBER;
+  resultats ARRAY DEFAULT ARRAY_CONSTRUCT();
+  sortie RESULTSET;
+BEGIN
+  USE SECONDARY ROLES NONE;
+  USE ROLE TRANSFORMER;
+  USE WAREHOUSE NYC_TAXI_WH;
+  SELECT HASH_AGG(*) INTO :avant_dim
+    FROM NYC_TAXI.MARTS.DIM_DRIVER;
+  SELECT HASH_AGG(*) INTO :avant_mensuel
+    FROM NYC_TAXI.MARTS.MART_DRIVER_MONTHLY;
+  SELECT HASH_AGG(*) INTO :avant_depot
+    FROM NYC_TAXI.MARTS.DIM_DEPOT;
 
 -- Reprise de snowflake/rh/staging/stg_rh__drivers.sql, à maintenir identique au fichier métier.
 -- À exécuter avec le rôle des outils (vérifiez le rôle affiché en haut à droite de la feuille).
@@ -109,15 +125,15 @@ FROM NYC_TAXI.STAGING.STG_RH__DRIVER_SHIFTS s
 LEFT JOIN NYC_TAXI.MARTS.DIM_DRIVER d ON d.driver_id = s.driver_id
 GROUP BY 1, 2, 3, 4;
 
-USE SECONDARY ROLES NONE;
-USE ROLE TRANSFORMER;
-USE WAREHOUSE NYC_TAXI_WH;
-SELECT IFF((SELECT COUNT(*) FROM NYC_TAXI.MARTS.DIM_DRIVER) = 400
- AND (SELECT COUNT(*) FROM NYC_TAXI.MARTS.MART_DRIVER_MONTHLY) = 914
- AND (SELECT HASH_AGG(*) FROM NYC_TAXI.MARTS.DIM_DRIVER) = $e5_avant_dim
- AND (SELECT HASH_AGG(*) FROM NYC_TAXI.MARTS.MART_DRIVER_MONTHLY) = $e5_avant_mensuel
- AND (SELECT HASH_AGG(*) FROM NYC_TAXI.MARTS.DIM_DEPOT) = $e5_avant_depot,
- 'OK', 'ECART') AS contenu_conserve;
+
+SELECT IFF(d.nb = 400 AND m.nb = 914
+ AND d.empreinte = :avant_dim
+ AND m.empreinte = :avant_mensuel
+ AND r.empreinte = :avant_depot, 'OK', 'ECART') INTO :statut
+FROM (SELECT COUNT(*) AS nb, HASH_AGG(*) AS empreinte FROM NYC_TAXI.MARTS.DIM_DRIVER) d
+CROSS JOIN (SELECT COUNT(*) AS nb, HASH_AGG(*) AS empreinte FROM NYC_TAXI.MARTS.MART_DRIVER_MONTHLY) m
+CROSS JOIN (SELECT HASH_AGG(*) AS empreinte FROM NYC_TAXI.MARTS.DIM_DEPOT) r;
+  resultats := ARRAY_APPEND(resultats, OBJECT_CONSTRUCT('ordre', 1, 'controle', 'CONTENU_CONSERVE', 'statut', statut));
 
 -- Recalcul indépendant depuis RAW, y compris dates, statut et ancienneté ; pas seulement les volumes.
 WITH attendu AS (
@@ -132,8 +148,9 @@ WITH attendu AS (
  UNION ALL
  (SELECT * FROM NYC_TAXI.MARTS.DIM_DRIVER MINUS SELECT * FROM attendu)
 )
-SELECT IFF(COUNT(*) = 0, 'OK', 'ECART') AS dimension_conforme_a_raw, COUNT(*) AS nb_differences
+SELECT IFF(COUNT(*) = 0, 'OK', 'ECART'), COUNT(*) INTO :statut, :nb_differences
 FROM differences;
+  resultats := ARRAY_APPEND(resultats, OBJECT_CONSTRUCT('ordre', 2, 'controle', 'DIMENSION_CONFORME_A_RAW', 'statut', statut, 'nb_differences', nb_differences));
 
 -- Les services orphelins restent présents : même LEFT JOIN que la transformation fournie.
 WITH services AS (
@@ -153,8 +170,9 @@ WITH services AS (
  UNION ALL
  (SELECT * FROM NYC_TAXI.MARTS.MART_DRIVER_MONTHLY MINUS SELECT * FROM attendu)
 )
-SELECT IFF(COUNT(*) = 0, 'OK', 'ECART') AS mensuel_conforme_a_raw, COUNT(*) AS nb_differences
+SELECT IFF(COUNT(*) = 0, 'OK', 'ECART'), COUNT(*) INTO :statut, :nb_differences
 FROM differences;
+  resultats := ARRAY_APPEND(resultats, OBJECT_CONSTRUCT('ordre', 3, 'controle', 'MENSUEL_CONFORME_A_RAW', 'statut', statut, 'nb_differences', nb_differences));
 
 -- Paie : la reconstruction ne doit pas avoir enregistré les masques.
 USE SECONDARY ROLES NONE;
@@ -163,7 +181,22 @@ USE WAREHOUSE NYC_TAXI_WH;
 SELECT IFF(COUNT(*) = 1 AND COUNT_IF(email LIKE '%@%' AND email <> '*****'
  AND first_name IS NOT NULL AND first_name <> '*****'
  AND last_name IS NOT NULL AND last_name <> '*****') = 1,
- 'OK', 'ECART') AS contact_temoin_reste_reel
+ 'OK', 'ECART') INTO :statut
 FROM NYC_TAXI.MARTS.DIM_DRIVER WHERE driver_id = 'D0003';
--- Suite : verification_catalogue.sql avec TRANSFORMER, verification_politiques.sql avec ACCOUNTADMIN,
--- puis refaire B0...B8 de 05_tests_acces.sql après la reconstruction et après la rejouabilité.
+  resultats := ARRAY_APPEND(resultats, OBJECT_CONSTRUCT('ordre', 4, 'controle', 'CONTACT_TEMOIN_RESTE_REEL', 'statut', statut));
+
+  commande := 'USE ROLE "' || REPLACE(role_initial, '"', '""') || '"';
+  EXECUTE IMMEDIATE :commande;
+  sortie := (
+    SELECT value:controle::VARCHAR AS controle, value:statut::VARCHAR AS statut,
+           value:nb_differences::NUMBER AS nb_differences
+    FROM TABLE(FLATTEN(INPUT => :resultats)) ORDER BY value:ordre::NUMBER
+  );
+  RETURN TABLE(sortie);
+EXCEPTION
+  WHEN OTHER THEN
+    commande := 'USE ROLE "' || REPLACE(role_initial, '"', '""') || '"';
+    EXECUTE IMMEDIATE :commande;
+    RAISE;
+END;
+$$;

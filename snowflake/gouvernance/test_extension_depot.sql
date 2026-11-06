@@ -1,6 +1,7 @@
 -- Étape 5 : tests à exécuter dans Snowsight ; ne pas inscrire de résultat supposé.
 -- Sorties : statuts et volumes uniquement ; aucune valeur personnelle ni empreinte affichée.
 -- Exécuter en entier, APRÈS activation et les tests initiaux.
+-- Un seul résultat final : le message OK du bloc après contrôle de l’extension et de la restauration.
 -- Précondition : pas de Brooklyn déjà accordé à Queens. Un accès préexistant est conservé.
 -- En cas de fermeture/interruption de session, relancer 04 pour rétablir les cinq accès initiaux.
 USE SECONDARY ROLES NONE;
@@ -53,4 +54,3 @@ EXCEPTION
     RAISE;
 END;
 $$;
-SELECT role_name, depot FROM NYC_TAXI.GOUVERNANCE.ACCES_DEPOT ORDER BY role_name, depot;

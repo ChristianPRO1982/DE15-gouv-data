@@ -65,8 +65,14 @@ BEGIN
       resultats := ARRAY_APPEND(resultats, OBJECT_CONSTRUCT('objet', r.objet, 'statut', 'ECART : lecture autorisée'));
     EXCEPTION
       WHEN STATEMENT_ERROR THEN
-        IF (SQLSTATE IN ('42501', '42S02')) THEN
-          resultats := ARRAY_APPEND(resultats, OBJECT_CONSTRUCT('objet', r.objet, 'statut', 'OK : lecture refusée'));
+        -- Snowflake peut signaler un objet invisible avec SQLSTATE 02000.
+        -- Ce cas n’est accepté qu’avec le message précis de résolution/autorisation ;
+        -- un autre 02000 (ou une erreur de syntaxe/calcul) ne vaut pas un refus prouvé.
+        IF (SQLSTATE IN ('42501', '42S02')
+            OR (SQLSTATE = '02000'
+                AND CONTAINS(LOWER(SQLERRM), 'does not exist or not authorized'))) THEN
+          resultats := ARRAY_APPEND(resultats, OBJECT_CONSTRUCT('objet', r.objet, 'statut', 'OK : lecture refusée',
+            'sqlstate', SQLSTATE, 'sqlcode', SQLCODE));
         ELSE
           RAISE; -- une erreur de syntaxe ou d’exécution n’est pas une preuve de restriction
         END IF;
@@ -115,8 +121,14 @@ BEGIN
       resultats := ARRAY_APPEND(resultats, OBJECT_CONSTRUCT('objet', r.objet, 'statut', 'ECART : lecture autorisée'));
     EXCEPTION
       WHEN STATEMENT_ERROR THEN
-        IF (SQLSTATE IN ('42501', '42S02')) THEN
-          resultats := ARRAY_APPEND(resultats, OBJECT_CONSTRUCT('objet', r.objet, 'statut', 'OK : lecture refusée'));
+        -- Snowflake peut signaler un objet invisible avec SQLSTATE 02000.
+        -- Ce cas n’est accepté qu’avec le message précis de résolution/autorisation ;
+        -- un autre 02000 (ou une erreur de syntaxe/calcul) ne vaut pas un refus prouvé.
+        IF (SQLSTATE IN ('42501', '42S02')
+            OR (SQLSTATE = '02000'
+                AND CONTAINS(LOWER(SQLERRM), 'does not exist or not authorized'))) THEN
+          resultats := ARRAY_APPEND(resultats, OBJECT_CONSTRUCT('objet', r.objet, 'statut', 'OK : lecture refusée',
+            'sqlstate', SQLSTATE, 'sqlcode', SQLCODE));
         ELSE
           RAISE; -- une erreur de syntaxe ou d’exécution n’est pas une preuve de restriction
         END IF;
@@ -165,8 +177,14 @@ BEGIN
       resultats := ARRAY_APPEND(resultats, OBJECT_CONSTRUCT('objet', r.objet, 'statut', 'ECART : lecture autorisée'));
     EXCEPTION
       WHEN STATEMENT_ERROR THEN
-        IF (SQLSTATE IN ('42501', '42S02')) THEN
-          resultats := ARRAY_APPEND(resultats, OBJECT_CONSTRUCT('objet', r.objet, 'statut', 'OK : lecture refusée'));
+        -- Snowflake peut signaler un objet invisible avec SQLSTATE 02000.
+        -- Ce cas n’est accepté qu’avec le message précis de résolution/autorisation ;
+        -- un autre 02000 (ou une erreur de syntaxe/calcul) ne vaut pas un refus prouvé.
+        IF (SQLSTATE IN ('42501', '42S02')
+            OR (SQLSTATE = '02000'
+                AND CONTAINS(LOWER(SQLERRM), 'does not exist or not authorized'))) THEN
+          resultats := ARRAY_APPEND(resultats, OBJECT_CONSTRUCT('objet', r.objet, 'statut', 'OK : lecture refusée',
+            'sqlstate', SQLSTATE, 'sqlcode', SQLCODE));
         ELSE
           RAISE; -- une erreur de syntaxe ou d’exécution n’est pas une preuve de restriction
         END IF;
@@ -213,8 +231,14 @@ BEGIN
       resultats := ARRAY_APPEND(resultats, OBJECT_CONSTRUCT('objet', r.objet, 'statut', 'ECART : lecture autorisée'));
     EXCEPTION
       WHEN STATEMENT_ERROR THEN
-        IF (SQLSTATE IN ('42501', '42S02')) THEN
-          resultats := ARRAY_APPEND(resultats, OBJECT_CONSTRUCT('objet', r.objet, 'statut', 'OK : lecture refusée'));
+        -- Snowflake peut signaler un objet invisible avec SQLSTATE 02000.
+        -- Ce cas n’est accepté qu’avec le message précis de résolution/autorisation ;
+        -- un autre 02000 (ou une erreur de syntaxe/calcul) ne vaut pas un refus prouvé.
+        IF (SQLSTATE IN ('42501', '42S02')
+            OR (SQLSTATE = '02000'
+                AND CONTAINS(LOWER(SQLERRM), 'does not exist or not authorized'))) THEN
+          resultats := ARRAY_APPEND(resultats, OBJECT_CONSTRUCT('objet', r.objet, 'statut', 'OK : lecture refusée',
+            'sqlstate', SQLSTATE, 'sqlcode', SQLCODE));
         ELSE
           RAISE; -- une erreur de syntaxe ou d’exécution n’est pas une preuve de restriction
         END IF;
@@ -270,8 +294,14 @@ BEGIN
       resultats := ARRAY_APPEND(resultats, OBJECT_CONSTRUCT('objet', r.objet, 'statut', 'ECART : lecture autorisée'));
     EXCEPTION
       WHEN STATEMENT_ERROR THEN
-        IF (SQLSTATE IN ('42501', '42S02')) THEN
-          resultats := ARRAY_APPEND(resultats, OBJECT_CONSTRUCT('objet', r.objet, 'statut', 'OK : lecture refusée'));
+        -- Snowflake peut signaler un objet invisible avec SQLSTATE 02000.
+        -- Ce cas n’est accepté qu’avec le message précis de résolution/autorisation ;
+        -- un autre 02000 (ou une erreur de syntaxe/calcul) ne vaut pas un refus prouvé.
+        IF (SQLSTATE IN ('42501', '42S02')
+            OR (SQLSTATE = '02000'
+                AND CONTAINS(LOWER(SQLERRM), 'does not exist or not authorized'))) THEN
+          resultats := ARRAY_APPEND(resultats, OBJECT_CONSTRUCT('objet', r.objet, 'statut', 'OK : lecture refusée',
+            'sqlstate', SQLSTATE, 'sqlcode', SQLCODE));
         ELSE
           RAISE; -- une erreur de syntaxe ou d’exécution n’est pas une preuve de restriction
         END IF;
@@ -306,8 +336,14 @@ BEGIN
       resultats := ARRAY_APPEND(resultats, OBJECT_CONSTRUCT('objet', r.objet, 'statut', 'ECART : lecture autorisée'));
     EXCEPTION
       WHEN STATEMENT_ERROR THEN
-        IF (SQLSTATE IN ('42501', '42S02')) THEN
-          resultats := ARRAY_APPEND(resultats, OBJECT_CONSTRUCT('objet', r.objet, 'statut', 'OK : lecture refusée'));
+        -- Snowflake peut signaler un objet invisible avec SQLSTATE 02000.
+        -- Ce cas n’est accepté qu’avec le message précis de résolution/autorisation ;
+        -- un autre 02000 (ou une erreur de syntaxe/calcul) ne vaut pas un refus prouvé.
+        IF (SQLSTATE IN ('42501', '42S02')
+            OR (SQLSTATE = '02000'
+                AND CONTAINS(LOWER(SQLERRM), 'does not exist or not authorized'))) THEN
+          resultats := ARRAY_APPEND(resultats, OBJECT_CONSTRUCT('objet', r.objet, 'statut', 'OK : lecture refusée',
+            'sqlstate', SQLSTATE, 'sqlcode', SQLCODE));
         ELSE
           RAISE; -- une erreur de syntaxe ou d’exécution n’est pas une preuve de restriction
         END IF;
