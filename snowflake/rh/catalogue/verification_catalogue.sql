@@ -29,7 +29,7 @@ FROM NYC_TAXI.INFORMATION_SCHEMA.COLUMNS
 WHERE (table_schema = 'RAW' AND table_name = 'DRIVERS')
    OR (table_schema = 'MARTS' AND table_name IN ('DIM_DRIVER', 'DIM_DEPOT'));
 
--- Attendu : 18 lignes OK ; couverture limitée aux catégories établies de l’inventaire.
+-- Attendu : 38 lignes OK ; inclut les 20 données professionnelles de l’extension autorisée.
 WITH attendus AS (
  SELECT column1 AS objet, column2 AS colonne, column3 AS valeur FROM VALUES
     ('RAW.DRIVERS', 'DRIVER_ID', 'identifiant_interne'),
@@ -49,7 +49,27 @@ WITH attendus AS (
     ('RAW.DRIVER_SHIFTS', 'SHIFT_ID', 'identifiant_interne'),
     ('RAW.DRIVER_SHIFTS', 'DRIVER_ID', 'identifiant_interne'),
     ('MARTS.MART_DRIVER_MONTHLY', 'DRIVER_ID', 'identifiant_interne'),
-    ('MARTS.MART_DRIVER_MONTHLY', 'DRIVER_NAME', 'nom')
+    ('MARTS.MART_DRIVER_MONTHLY', 'DRIVER_NAME', 'nom'),
+    ('RAW.DRIVERS', 'DEPOT', 'donnee_professionnelle'),
+    ('RAW.DRIVERS', 'HIRE_DATE', 'donnee_professionnelle'),
+    ('RAW.DRIVERS', 'END_DATE', 'donnee_professionnelle'),
+    ('MARTS.DIM_DRIVER', 'DEPOT', 'donnee_professionnelle'),
+    ('MARTS.DIM_DRIVER', 'HIRE_DATE', 'donnee_professionnelle'),
+    ('MARTS.DIM_DRIVER', 'END_DATE', 'donnee_professionnelle'),
+    ('MARTS.DIM_DRIVER', 'IS_ACTIVE', 'donnee_professionnelle'),
+    ('MARTS.DIM_DRIVER', 'TENURE_YEARS', 'donnee_professionnelle'),
+    ('RAW.DRIVER_SHIFTS', 'SHIFT_DATE', 'donnee_professionnelle'),
+    ('RAW.DRIVER_SHIFTS', 'DEPOT', 'donnee_professionnelle'),
+    ('RAW.DRIVER_SHIFTS', 'START_HOUR', 'donnee_professionnelle'),
+    ('RAW.DRIVER_SHIFTS', 'HOURS_WORKED', 'donnee_professionnelle'),
+    ('RAW.DRIVER_SHIFTS', 'TRIPS_COUNT', 'donnee_professionnelle'),
+    ('RAW.DRIVER_SHIFTS', 'REVENUE_USD', 'donnee_professionnelle'),
+    ('MARTS.MART_DRIVER_MONTHLY', 'ACTIVITY_MONTH', 'donnee_professionnelle'),
+    ('MARTS.MART_DRIVER_MONTHLY', 'DEPOT', 'donnee_professionnelle'),
+    ('MARTS.MART_DRIVER_MONTHLY', 'NB_SHIFTS', 'donnee_professionnelle'),
+    ('MARTS.MART_DRIVER_MONTHLY', 'HOURS_WORKED', 'donnee_professionnelle'),
+    ('MARTS.MART_DRIVER_MONTHLY', 'TRIPS_COUNT', 'donnee_professionnelle'),
+    ('MARTS.MART_DRIVER_MONTHLY', 'REVENUE_USD', 'donnee_professionnelle')
 ), tags AS (
 SELECT 'RAW.DRIVERS' AS objet, column_name, tag_name, tag_value
 FROM TABLE(NYC_TAXI.INFORMATION_SCHEMA.TAG_REFERENCES_ALL_COLUMNS('NYC_TAXI.RAW.DRIVERS', 'TABLE'))

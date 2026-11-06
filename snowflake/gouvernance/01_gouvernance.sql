@@ -26,8 +26,14 @@ CREATE TAG IF NOT EXISTS NYC_TAXI.GOUVERNANCE.SENSIBILITE
   COMMENT = 'Sensibilité de la table cataloguée';
 CREATE TAG IF NOT EXISTS NYC_TAXI.GOUVERNANCE.DONNEE_PERSONNELLE
   ALLOWED_VALUES 'nom', 'email', 'telephone', 'date_naissance',
-                 'identifiant_officiel', 'identifiant_interne'
-  COMMENT = 'Catégorie personnelle du contrat ; taxonomie professionnelle incomplète, voir REGISTRE';
+                 'identifiant_officiel', 'identifiant_interne', 'donnee_professionnelle'
+  COMMENT = 'Catégorie personnelle ; extension donnee_professionnelle autorisée par le titulaire, voir REGISTRE';
+-- Mettre à jour aussi le tag déjà installé, sans le recréer.
+ALTER TAG NYC_TAXI.GOUVERNANCE.DONNEE_PERSONNELLE SET
+  ALLOWED_VALUES 'nom', 'email', 'telephone', 'date_naissance',
+                 'identifiant_officiel', 'identifiant_interne', 'donnee_professionnelle';
+ALTER TAG NYC_TAXI.GOUVERNANCE.DONNEE_PERSONNELLE SET
+  COMMENT = 'Catégorie personnelle ; extension donnee_professionnelle autorisée par le titulaire, voir REGISTRE';
 CREATE TAG IF NOT EXISTS NYC_TAXI.GOUVERNANCE.DUREE_CONSERVATION
   COMMENT = 'Durée documentaire ; ne déclenche aucune purge';
 CREATE TABLE IF NOT EXISTS NYC_TAXI.GOUVERNANCE.QUALITE_RESULTATS (

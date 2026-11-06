@@ -2,6 +2,7 @@ COLUMN_NAME,TAG_NAME,TAG_VALUE
 BIRTH_DATE,DONNEE_PERSONNELLE,date_naissance
 BIRTH_DATE,DUREE_CONSERVATION,5 ans après la fin du contrat du chauffeur ; application technique au jour 3
 BIRTH_DATE,SENSIBILITE,confidentiel
+DEPOT,DONNEE_PERSONNELLE,donnee_professionnelle
 DEPOT,DUREE_CONSERVATION,5 ans après la fin du contrat du chauffeur ; application technique au jour 3
 DEPOT,SENSIBILITE,confidentiel
 DRIVER_ID,DONNEE_PERSONNELLE,identifiant_interne
@@ -10,13 +11,16 @@ DRIVER_ID,SENSIBILITE,confidentiel
 EMAIL,DONNEE_PERSONNELLE,email
 EMAIL,DUREE_CONSERVATION,5 ans après la fin du contrat du chauffeur ; application technique au jour 3
 EMAIL,SENSIBILITE,confidentiel
+END_DATE,DONNEE_PERSONNELLE,donnee_professionnelle
 END_DATE,DUREE_CONSERVATION,5 ans après la fin du contrat du chauffeur ; application technique au jour 3
 END_DATE,SENSIBILITE,confidentiel
 FIRST_NAME,DONNEE_PERSONNELLE,nom
 FIRST_NAME,DUREE_CONSERVATION,5 ans après la fin du contrat du chauffeur ; application technique au jour 3
 FIRST_NAME,SENSIBILITE,confidentiel
+HIRE_DATE,DONNEE_PERSONNELLE,donnee_professionnelle
 HIRE_DATE,DUREE_CONSERVATION,5 ans après la fin du contrat du chauffeur ; application technique au jour 3
 HIRE_DATE,SENSIBILITE,confidentiel
+IS_ACTIVE,DONNEE_PERSONNELLE,donnee_professionnelle
 IS_ACTIVE,DUREE_CONSERVATION,5 ans après la fin du contrat du chauffeur ; application technique au jour 3
 IS_ACTIVE,SENSIBILITE,confidentiel
 LAST_NAME,DONNEE_PERSONNELLE,nom
@@ -25,6 +29,7 @@ LAST_NAME,SENSIBILITE,confidentiel
 PHONE,DONNEE_PERSONNELLE,telephone
 PHONE,DUREE_CONSERVATION,5 ans après la fin du contrat du chauffeur ; application technique au jour 3
 PHONE,SENSIBILITE,confidentiel
+TENURE_YEARS,DONNEE_PERSONNELLE,donnee_professionnelle
 TENURE_YEARS,DUREE_CONSERVATION,5 ans après la fin du contrat du chauffeur ; application technique au jour 3
 TENURE_YEARS,SENSIBILITE,confidentiel
 TLC_LICENSE_NUMBER,DONNEE_PERSONNELLE,identifiant_officiel

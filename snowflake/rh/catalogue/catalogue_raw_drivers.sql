@@ -1,5 +1,5 @@
 -- Fiche rejouable ; prérequis : gouvernance/01_gouvernance.sql.
--- Les catégories professionnelles absentes du contrat restent à clarifier (docs/REGISTRE.md).
+-- Extension donnee_professionnelle autorisée le 6 novembre 2026 ; voir docs/REGISTRE.md.
 USE SECONDARY ROLES NONE;
 USE ROLE TRANSFORMER;
 USE WAREHOUSE NYC_TAXI_WH;
@@ -35,6 +35,14 @@ ALTER TABLE NYC_TAXI.RAW.DRIVERS MODIFY COLUMN birth_date
   SET TAG NYC_TAXI.GOUVERNANCE.DONNEE_PERSONNELLE = 'date_naissance';
 ALTER TABLE NYC_TAXI.RAW.DRIVERS MODIFY COLUMN tlc_license_number
   SET TAG NYC_TAXI.GOUVERNANCE.DONNEE_PERSONNELLE = 'identifiant_officiel';
+
+-- Données professionnelles rattachées à un chauffeur identifiable.
+ALTER TABLE NYC_TAXI.RAW.DRIVERS MODIFY COLUMN depot
+  SET TAG NYC_TAXI.GOUVERNANCE.DONNEE_PERSONNELLE = 'donnee_professionnelle';
+ALTER TABLE NYC_TAXI.RAW.DRIVERS MODIFY COLUMN hire_date
+  SET TAG NYC_TAXI.GOUVERNANCE.DONNEE_PERSONNELLE = 'donnee_professionnelle';
+ALTER TABLE NYC_TAXI.RAW.DRIVERS MODIFY COLUMN end_date
+  SET TAG NYC_TAXI.GOUVERNANCE.DONNEE_PERSONNELLE = 'donnee_professionnelle';
 
 SELECT column_name, comment FROM NYC_TAXI.INFORMATION_SCHEMA.COLUMNS
 WHERE table_schema = 'RAW' AND table_name = 'DRIVERS'

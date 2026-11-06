@@ -10,9 +10,18 @@
 
 Une donnée décrivant l’activité d’un chauffeur identifiable reste personnelle même sans nom. `driver_id` est un identifiant indirect/pseudonyme, pas une anonymisation. Fondement : [RGPD art. 4(1) et 4(5)](https://www.cnil.fr/fr/reglement-europeen-protection-donnees/chapitre1), consulté le 3 novembre 2026.
 
-### Taxonomie et choix encore ouverts
+### Taxonomie — extension autorisée le 6 novembre 2026
 
-Les tags de cette page sont **prévus**, pas encore confirmés dans Snowflake. Les quatre fiches SQL de `snowflake/rh/catalogue/` préparent les 18 affectations dont la catégorie est établie, y compris `shift_id` et `driver_name`. Le 4 novembre 2026, le titulaire a choisi de garder explicitement à clarifier avec le formateur les catégories professionnelles manquantes ; aucune valeur non autorisée ni catégorie de substitution n’est ajoutée. Ces colonnes restent dans le périmètre personnel et la couverture du tag est donc partielle. Les valeurs autorisées du contrat sont `nom`, `email`, `telephone`, `date_naissance`, `identifiant_officiel`, `identifiant_interne`. La mention **« à clarifier » n’est pas une valeur SQL** : le contrat ne prévoit aucune catégorie explicite pour les données professionnelles indirectes. Ne pas leur attribuer arbitrairement `identifiant_interne`, car cela pourrait les faire bénéficier de l’exception de visibilité prévue pour `driver_id`. Signaler ce manque au formateur et au référent gouvernance, tout en incluant ces données dans la conservation et l’analyse des accès.
+Le titulaire a autorisé l’ajout de `donnee_professionnelle` aux six valeurs du contrat pour couvrir les données professionnelles liées à un chauffeur identifiable. Cette adaptation est documentée ici sans modifier le contrat pédagogique. Les 18 affectations initiales et les 20 nouvelles affectations sont appliquées : le titulaire confirme le 6 novembre 2026 que tous les scripts passent et que le contrôle affiche 38 lignes, avec les compteurs de descriptions inchangés (5 tables et 28 colonnes). Le script `01_gouvernance.sql` met à jour le tag existant avec ALTER TAG, sans le recréer.
+
+| Table | Colonnes classées `donnee_professionnelle` |
+|---|---|
+| RAW.DRIVERS | depot, hire_date, end_date |
+| MARTS.DIM_DRIVER | depot, hire_date, end_date, is_active, tenure_years |
+| RAW.DRIVER_SHIFTS | shift_date, depot, start_hour, hours_worked, trips_count, revenue_usd |
+| MARTS.MART_DRIVER_MONTHLY | activity_month, depot, nb_shifts, hours_worked, trips_count, revenue_usd |
+
+Les identifiants, noms et coordonnées conservent leurs catégories existantes. Les métadonnées techniques de fichier et de chargement restent hors du tag personnel, selon l’inventaire ci-dessous, mais sont supprimées avec la ligne. Le tag ne définit pas à lui seul les accès : au jour 2, prévoir les types texte, date, nombre et booléen et la compatibilité du dépôt avec le filtre de lignes. Les mesures d’activité doivent rester utilisables selon les besoins métier du contrat ; cette catégorie n’implique pas de les masquer toutes automatiquement.
 
 ### `drivers.csv` — 400 lignes, 10 colonnes
 
@@ -25,9 +34,9 @@ Les tags de cette page sont **prévus**, pas encore confirmés dans Snowflake. L
 | `phone` | numéro de démonstration | Identifiant direct | `telephone` | Paie et responsable du dépôt : contact opérationnel |
 | `birth_date` | `AAAA-MM-JJ` | Identifiant indirect | `date_naissance` | Paie : justification RH à confirmer ; analyste : année seulement selon le contrat |
 | `tlc_license_number` | format de licence TLC | Identifiant direct par rapprochement avec le registre public | `identifiant_officiel` | Paie/RH : identification professionnelle ; pipeline : contrôle d’unicité ; publicité de la licence ≠ libre accès dans l’entrepôt |
-| `depot` | `Queens` | Donnée personnelle indirecte de rattachement dans cette table | À clarifier | Paie : affectation ; responsables : leur périmètre ; analyste : activité par dépôt ; filtre de lignes |
-| `hire_date` | `AAAA-MM-JJ` | Donnée professionnelle indirecte | À clarifier | RH/paie : gestion du contrat ; pipeline : ancienneté et cohérence des dates ; nécessité pour les autres rôles à examiner |
-| `end_date` | date ou champ vide | Donnée professionnelle indirecte | À clarifier | RH/paie : départ ; pipeline : statut et calcul de la purge ; vide = en poste |
+| `depot` | `Queens` | Donnée personnelle indirecte de rattachement dans cette table | `donnee_professionnelle` | Paie : affectation ; responsables : leur périmètre ; analyste : activité par dépôt ; filtre de lignes |
+| `hire_date` | `AAAA-MM-JJ` | Donnée professionnelle indirecte | `donnee_professionnelle` | RH/paie : gestion du contrat ; pipeline : ancienneté et cohérence des dates ; nécessité pour les autres rôles à examiner |
+| `end_date` | date ou champ vide | Donnée professionnelle indirecte | `donnee_professionnelle` | RH/paie : départ ; pipeline : statut et calcul de la purge ; vide = en poste |
 
 ### `driver_shifts.csv` — 25 951 lignes, 8 colonnes
 
@@ -35,12 +44,12 @@ Les tags de cette page sont **prévus**, pas encore confirmés dans Snowflake. L
 |---|---|---|---|---|
 | `shift_id` | `Sxxxxxx` | Identifiant indirect d’un événement lié à une personne | `identifiant_interne` (aucune exception automatique de visibilité) | Pipeline : contrôle d’unicité et déduplication ; absent des MARTS fournis |
 | `driver_id` | `Dxxxx` | Identifiant indirect du chauffeur | `identifiant_interne` | Pipeline : rattachement ; métier : compter/joindre sans nommer |
-| `shift_date` | `AAAA-MM-JJ` | Activité professionnelle indirectement identifiante | À clarifier | Pipeline : mois d’activité ; paie et analyse : période de travail |
-| `depot` | `Bronx` | Lieu de travail rattaché à une personne | À clarifier | Pipeline : regroupement ; responsables : périmètre ; analyse par dépôt |
-| `start_hour` | heure entière | Horaire individuel, indirect | À clarifier | Organisation d’un service ; aucun usage dans les MARTS fournis, collecte à justifier |
-| `hours_worked` | nombre décimal | Mesure individuelle de travail, indirecte | À clarifier | Paie, dépôt et analyste : volumes de travail, agrégés mensuellement |
-| `trips_count` | entier | Mesure individuelle d’activité, indirecte | À clarifier | Dépôt et analyste : activité ; besoin paie à confirmer |
-| `revenue_usd` | montant décimal | Mesure individuelle de recette, indirecte | À clarifier | Analyse et suivi métier ; besoin d’accès individuel à justifier |
+| `shift_date` | `AAAA-MM-JJ` | Activité professionnelle indirectement identifiante | `donnee_professionnelle` | Pipeline : mois d’activité ; paie et analyse : période de travail |
+| `depot` | `Bronx` | Lieu de travail rattaché à une personne | `donnee_professionnelle` | Pipeline : regroupement ; responsables : périmètre ; analyse par dépôt |
+| `start_hour` | heure entière | Horaire individuel, indirect | `donnee_professionnelle` | Organisation d’un service ; aucun usage dans les MARTS fournis, collecte à justifier |
+| `hours_worked` | nombre décimal | Mesure individuelle de travail, indirecte | `donnee_professionnelle` | Paie, dépôt et analyste : volumes de travail, agrégés mensuellement |
+| `trips_count` | entier | Mesure individuelle d’activité, indirecte | `donnee_professionnelle` | Dépôt et analyste : activité ; besoin paie à confirmer |
+| `revenue_usd` | montant décimal | Mesure individuelle de recette, indirecte | `donnee_professionnelle` | Analyse et suivi métier ; besoin d’accès individuel à justifier |
 
 Les heures, courses et recettes concernent un chauffeur dès lors qu’elles sont liées à `driver_id`. Les totaux mensuels par chauffeur restent personnels. Ces fichiers ne révèlent pas à première lecture de catégorie particulière de l’article 9 ; aucune telle donnée n’est nécessaire au brief.
 
