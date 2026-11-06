@@ -171,3 +171,45 @@ L’extension du tag existant utilise [ALTER TAG SET ALLOWED_VALUES](https://doc
 
 
 **Preuves renouvelées vérifiées le 6 novembre 2026 :** `docs/tags_dim_driver.csv` contient 36 références : 12 DONNEE_PERSONNELLE, 12 DUREE_CONSERVATION et 12 SENSIBILITE. Les cinq affectations donnee_professionnelle attendues sont présentes sur DEPOT, HIRE_DATE, END_DATE, IS_ACTIVE et TENURE_YEARS. La capture `docs/tags_dim_driver.png` renouvelée est lisible, affiche 36 lignes au total et montre la nouvelle catégorie sur les premières lignes. Elle complète le CSV intégral. Ces preuves remplacent les anciens fichiers à 31 références. Étape 4 terminée avec l’extension de taxonomie autorisée par le titulaire et documentée, sans modification du contrat fourni.
+
+
+### Accès métier — étape 5, préparation du 6 novembre 2026
+
+**État : scripts et attendus préparés localement ; exécutions Snowsight, tests et capture à confirmer.** Le cahier de tests est écrit avant les politiques dans [ACCES.md](docs/ACCES.md#partie-2--cahier-de-tests--étape-5). Ne pas interpréter les attendus comme des résultats obtenus.
+
+Toutes les colonnes existantes sont conservées : la paie utilise les données complètes et le pipeline doit reconstruire les valeurs réelles. Des masques adaptés au rôle évitent de multiplier les tables. Les données professionnelles restent visibles aux métiers dans leur périmètre, conformément au choix du titulaire.
+
+| Colonnes | Décision et justification |
+|---|---|
+| `driver_id` dans les deux MARTS | Clair pour les métiers et TRANSFORMER : compter et joindre ; reste un pseudonyme personnel. Masqué dans RAW pour les administrateurs. |
+| `first_name`, `last_name`, `driver_name` | Clair paie/responsables/TRANSFORMER ; `*****` analyste. Le nom calculé reçoit aussi une politique. |
+| `phone` | Clair paie/responsables/TRANSFORMER pour le contact opérationnel ; `*****` analyste. |
+| `email`, `tlc_license_number` | Clair paie/TRANSFORMER ; `*****` responsables et analyste. Le caractère public d’une licence ne justifie pas son exposition ici. |
+| `birth_date` | Date complète paie/TRANSFORMER ; NULL responsables ; 1er janvier de l’année source pour ANALYSTE (convention d’année, pas une naissance exacte). |
+| `depot` | Clair dans les lignes MARTS autorisées ; paramètre du filtre. Tag personnel conservé, aucun masque sur cette colonne MARTS. |
+| `hire_date`, `end_date` | Conservées et visibles dans MARTS : suivi contractuel et futur point de départ de purge. |
+| `is_active`, `tenure_years` | Conservés et visibles dans MARTS pour les analyses d’effectifs et d’ancienneté. |
+| `activity_month`, `nb_shifts`, `hours_worked`, `trips_count`, `revenue_usd` | Visibles dans les lignes mensuelles autorisées pour l’activité ; restent personnels car rattachés à un chauffeur. |
+| Les 18 colonnes personnelles RAW, dont `shift_id` | Valeurs réelles pour TRANSFORMER seul ; texte `*****`, DATE/NUMBER/FLOAT NULL pour les autres lecteurs. Aucun rôle métier ne reçoit SELECT RAW/STAGING. |
+| `_source_file`, `_loaded_at` | Métadonnées techniques conservées ; aucun droit métier RAW/STAGING. |
+| Les quatre colonnes DIM_DEPOT | Référentiel non personnel, sans filtre ni masque ; trois dépôts lisibles par chaque métier. |
+
+Un NULL source reste NULL. Aucune suppression de colonne, modification de schéma ou transformation métier n’est nécessaire. Les BOOLEAN professionnels de MARTS restent visibles ; aucune politique BOOLEAN n’est donc nécessaire à cette étape.
+
+Le masquage est attaché **directement aux colonnes**. Les trois tags et leurs 38 affectations restent documentaires pour cette implémentation : le tag DONNEE_PERSONNELLE ne déclenche pas automatiquement de politique. Cette décision évite de masquer `depot`, utilisé par le filtre, car [Snowflake interdit de placer la même colonne dans les signatures d’un masque et d’une politique de lignes](https://docs.snowflake.com/en/user-guide/security-row-intro#masking-policies). Une nouvelle colonne nécessite donc une décision d’accès et un attachement explicite. Le contrôle des attachements doit être étendu avec elle.
+
+Les règles consultent le rôle principal (`CURRENT_ROLE()`), jamais la puissance administrative ni les rôles hérités. ACCOUNTADMIN et SYSADMIN ne voient aucune ligne des deux MARTS RH ; ils héritent de la lecture RAW/STAGING, où les valeurs personnelles sont masquées. GOUVERNANCE peut écrire les politiques et lire ses correspondances, sans SELECT RH. Ce contrôle protège la lecture courante : les administrateurs et le propriétaire des objets peuvent modifier les protections ; l’audit de ces pouvoirs reste à mettre en place au jour 3. Retirer un tag n’enlève pas les masques directs.
+
+#### Ordre d’exécution de l’étape 5
+
+1. Lire les attendus et exécuter les exemples 00/01 si nécessaire, puis 02/03 par blocs ; retirer ensuite l’accès temporaire Sud.
+2. Exécuter [02_roles_metier.sql](snowflake/gouvernance/02_roles_metier.sql) : créer les rôles et préparer leurs droits, sans nouvelle attribution au testeur.
+3. Exécuter [03_masquage.sql](snowflake/gouvernance/03_masquage.sql), puis [04_acces_depot.sql](snowflake/gouvernance/04_acces_depot.sql), avec GOUVERNANCE. Aucun métier nouvellement créé ne doit être attribué avant cette protection.
+4. Exécuter [verification_politiques.sql](snowflake/gouvernance/verification_politiques.sql) avec ACCOUNTADMIN : 27 masques et 2 filtres conformes. Seulement après ces résultats, lancer [activation_roles_metier.sql](snowflake/gouvernance/activation_roles_metier.sql) pour attribuer les quatre rôles à l’utilisateur courant.
+5. Dans une même session Snowsight, lancer [05_tests_acces.sql](snowflake/gouvernance/05_tests_acces.sql) **bloc par bloc**, de haut en bas. Le premier bloc calcule des références temporaires sans créer de table de données. Garder la session ; ne jamais exporter les variables d’empreinte.
+6. Exécuter [test_extension_depot.sql](snowflake/gouvernance/test_extension_depot.sql) : ajout temporaire de Brooklyn au responsable Queens, puis restauration automatique de la correspondance initiale.
+7. Exécuter [verification_pipeline_acces.sql](snowflake/gouvernance/verification_pipeline_acces.sql) pour les références avant/après, la reconstruction et la comparaison aux sources ; puis [verification_catalogue.sql](snowflake/rh/catalogue/verification_catalogue.sql) et le contrôle des politiques.
+8. Rejouer 01, 02, 03, 04, les cinq fiches catalogue et les contrôles ; vérifier la carte des droits (`SHOW GRANTS`, y compris futurs et héritages), puis refaire les tests. Le 04 remet volontairement les cinq correspondances initiales ; il ne sert pas à conserver des extensions métier permanentes.
+9. Exécuter [capture_acces.sql](snowflake/gouvernance/capture_acces.sql) par rôle et enregistrer une capture des deux résultats agrégés. Renseigner seulement alors les résultats observés dans ACCES.md et le plan local.
+
+En cas d’erreur, arrêter au bloc concerné et transmettre le message avant de poursuivre. Les scripts ne remplacent ni ne détachent silencieusement une politique inattendue. Les scripts 03/04 mettent les corps à jour sans recréer les politiques ; les réexécutions n’effacent ni données RH ni historique de qualité. Une attribution ou un droit préexistant inattendu doit être signalé et examiné : créer un rôle avec IF NOT EXISTS ne retire pas ses anciens droits.
