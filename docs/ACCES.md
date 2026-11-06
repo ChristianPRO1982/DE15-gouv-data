@@ -48,9 +48,13 @@ Le propriétaire d'un objet est le rôle qui l'a créé.
 
 Ces pouvoirs sont nécessaires au montage pédagogique ; l’audit des lectures et changements reste à mettre en place au jour 3. Les droits métier et les politiques ne sont pas créés à cette étape. Contrôler `SHOW GRANTS TO ROLE GOUVERNANCE` avec ACCOUNTADMIN, y compris les éventuels rôles hérités préexistants ; `CREATE IF NOT EXISTS` ne supprime pas d’anciens droits.
 
-Sources vérifiées le 4 novembre 2026 : [privilèges Snowflake](https://docs.snowflake.com/en/user-guide/security-access-control-privileges), [gestion des tags](https://docs.snowflake.com/en/user-guide/object-tagging/work). Résultats de `01_gouvernance.sql` reçus et conformes le 4 novembre 2026 : propriétés du schéma, des trois tags et de QUALITE_RESULTATS, droits globaux de GOUVERNANCE, droits de TRANSFORMER sur les tags, les résultats et la création de vues. Aucun SELECT RH ni rôle de lecture hérité dans les attributions fournies de GOUVERNANCE ; NB_MESURES = 0. Le contrôle du catalogue reste à exécuter.
+Sources vérifiées le 4 novembre 2026 : [privilèges Snowflake](https://docs.snowflake.com/en/user-guide/security-access-control-privileges), [gestion des tags](https://docs.snowflake.com/en/user-guide/object-tagging/work). Résultats de `01_gouvernance.sql` reçus et conformes le 4 novembre 2026 : propriétés du schéma, des trois tags et de QUALITE_RESULTATS, droits globaux de GOUVERNANCE, droits de TRANSFORMER sur les tags, les résultats et la création de vues. Aucun SELECT RH ni rôle de lecture hérité dans les attributions fournies de GOUVERNANCE ; NB_MESURES = 0. Contrôle global du catalogue reçu le 6 novembre 2026 : conforme (5 tables décrites, 28 colonnes décrites, 18 tags personnels OK) ; propriétés TRANSFORMER sur les cinq tables et les deux vues STAGING confirmées. Attribution de GOUVERNANCE à l’utilisateur testeur confirmée, aucun identifiant personnel recopié. Rejouabilité et capture encore attendues.
 
 ---
+
+
+
+**Rejouabilité de l’installation de gouvernance confirmée le 6 novembre 2026 :** après relance de `snowflake/gouvernance/01_gouvernance.sql`, le titulaire transmet les trois tags avec leurs dates de création initiales et les valeurs autorisées inchangées, la structure conforme de QUALITE_RESULTATS, les propriétaires et droits attendus pour GOUVERNANCE et TRANSFORMER, puis NB_MESURES = 0. Cette relance est validée sur ces résultats ; la conservation de mesures préexistantes n’est pas testée puisque la table est vide. La relance des cinq fiches, le nouveau contrôle global et la capture restent à confirmer.
 
 ## Partie 2 — Cahier de tests
 
